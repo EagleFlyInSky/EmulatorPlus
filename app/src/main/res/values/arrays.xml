@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <!-- 这里填写模块的作用域应用的包名，可以填多个。 -->
+
+        <!-- ES-DE -->
+        <item>org.es_de.frontend</item>
+        <!-- RPG -->
+        <item>com.aopaop.app</item>
+        <item>net.miririt.maldivesplayer</item>
+        <item>cyou.joiplay.joiplay</item>
+        <item>com.akira.tyranoemu</item>
+        <!-- 游戏梦工厂 -->
+        <item>com.GameDreamFactoryAndroid</item>
+        <!-- moonlight -->
+        <item>com.limelight</item>
+        <item>com.limelight.debug</item>
+        <!-- Winlator -->
+        <item>com.winlator</item>
+        <item>com.wb64</item>
+        <item>com.WineBox64</item>
+        <item>com.winlatorA</item>
+        <item>com.winlatorB</item>
+    </string-array>
+</resources>
