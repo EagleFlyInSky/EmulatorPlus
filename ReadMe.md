@@ -3,6 +3,11 @@
 本项目为 ```xposed``` 项目。
 功能为增强模拟器和ES-DE前端的适配。
 
+## ES-DE 自定义配置
+
+[配置](https://github.com/EagleFlyInSky/ES-DE-Custom)
+
+
 ## 目前适配
 
 ### JoiPlay
