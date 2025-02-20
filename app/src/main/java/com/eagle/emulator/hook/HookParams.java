@@ -8,6 +8,8 @@ public class HookParams {
     public static final String AOPAOP = "com.aopaop.app";
     public static final String MALDIVES = "net.miririt.maldivesplayer";
     public static final String JOIPLAY = "cyou.joiplay.joiplay";
+    public static final String JOIPLAY_RUFFLE = "cyou.joiplay.runtime.ruffle";
+    public static final String JOIPLAY_RPGMAKER = "cyou.joiplay.runtime.rpgmaker";
 
 
     public static final String TYRANOR = "com.akira.tyranoemu";

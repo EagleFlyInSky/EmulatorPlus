@@ -39,6 +39,10 @@ public class MainHook implements IXposedHookLoadPackage {
             case HookParams.JOIPLAY:
                 JoiPlayHook.hook(lpparam);
                 break;
+            case HookParams.JOIPLAY_RUFFLE:
+            case HookParams.JOIPLAY_RPGMAKER:
+                JoiPlayHook.hookGamePad(lpparam);
+                break;
             case HookParams.TYRANOR:
                 TyranorHook.hook(lpparam);
                 break;

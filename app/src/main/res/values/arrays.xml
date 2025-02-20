@@ -9,6 +9,8 @@
         <item>com.aopaop.app</item>
         <item>net.miririt.maldivesplayer</item>
         <item>cyou.joiplay.joiplay</item>
+        <item>cyou.joiplay.runtime.ruffle</item>
+        <item>cyou.joiplay.runtime.rpgmaker</item>
         <item>com.akira.tyranoemu</item>
         <!-- 游戏梦工厂 -->
         <item>com.GameDreamFactoryAndroid</item>

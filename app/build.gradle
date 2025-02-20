@@ -5,6 +5,7 @@ plugins {
 android {
     namespace 'com.eagle.emulator'
     compileSdk 34
+    version "1.0.0"
 
     defaultConfig {
         applicationId "com.eagle.emulator"
@@ -23,8 +24,7 @@ android {
         }
 
         applicationVariants.all { variant ->
-            variant.outputs.all { output ->
-                output.outputFileName = "EmulatorPlus.apk"
+            variant.outputs.all { output -> output.outputFileName = "EmulatorPlus-${version}.apk"
             }
         }
 
@@ -38,9 +38,8 @@ android {
 
 dependencies {
 
-//    compileOnly fileTree(dir: 'libs', include: ['*.jar'])
+    //compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly libs.xposed.api
     implementation libs.hutool.core
-
 
 }

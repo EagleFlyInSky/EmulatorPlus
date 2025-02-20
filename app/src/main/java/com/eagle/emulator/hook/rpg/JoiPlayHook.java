@@ -2,7 +2,10 @@ package com.eagle.emulator.hook.rpg;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Environment;
 import android.util.Log;
+import android.view.View;
 
 import com.eagle.emulator.hook.HookParams;
 
@@ -27,10 +30,70 @@ public class JoiPlayHook {
     public static final String HOOK_CLASS_NAME = "cyou.joiplay.joiplay.activities.SplashActivity";
 
 
+    public static final String HOOK_RUFFLE_CLASS_NAME = "cyou.joiplay.runtime.ruffle.MainActivity";
+
+
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
         hookId(lpparam);
+        hookGamePad(lpparam);
         hookStart(lpparam);
     }
+
+
+    public static void hookBackground(XC_LoadPackage.LoadPackageParam lpparam) {
+
+        String className = View.class.getName();
+        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "onFinishInflate", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                View view = (View) param.thisObject;
+
+                String name = view.getClass().getName();
+
+                view.setBackgroundColor(Color.parseColor("#6495ED"));
+
+                Log.i(HookParams.LOG_TAG, "view:" + name);
+            }
+
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+            }
+        });
+    }
+
+
+    /**
+     * hookGamePad
+     * 修改按键配置文件位置
+     *
+     * @param lpparam 参数
+     */
+    public static void hookGamePad(XC_LoadPackage.LoadPackageParam lpparam) {
+
+        String absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+
+        String className = String.class.getName();
+        XposedHelpers.findAndHookMethod(className, lpparam.classLoader, "startsWith", className, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                String thisObject = (String) param.thisObject;
+                String prefix = (String) param.args[0];
+                if (absolutePath.equals(prefix)) {
+                    Log.i(HookParams.LOG_TAG, "thisObject:" + thisObject);
+                    param.setResult(true);
+                }
+            }
+
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+            }
+        });
+    }
+
 
     /**
      * hookId 生成
@@ -52,7 +115,6 @@ public class JoiPlayHook {
                 super.afterHookedMethod(param);
             }
         });
-
     }
 
     private static void hookStart(XC_LoadPackage.LoadPackageParam lpparam) {
