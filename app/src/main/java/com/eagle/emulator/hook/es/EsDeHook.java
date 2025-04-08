@@ -8,11 +8,10 @@ import com.eagle.emulator.hook.HookParams;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import de.robv.android.xposed.XC_MethodHook;
@@ -65,50 +64,64 @@ public class EsDeHook {
                 String path = fix((String) param.args[7]);
 
                 Log.i(HookParams.LOG_TAG, "data:" + data);
+                String new_data = parseParams(data, path, systemPath);
+                param.args[5] = new_data;
+                Log.i(HookParams.LOG_TAG, "new_data:" + new_data);
 
+                HashMap<String, String> extras = (HashMap<String, String>) param.args[8];
+                for (Map.Entry<String, String> entry : extras.entrySet()) {
+                    String value = entry.getValue();
+                    String result = parseParams(value, path, systemPath);
+                    entry.setValue(result);
+                }
+
+            }
+
+            private String parseParams(String text, String path, String systemPath) {
                 String romsafKey = "%ROMSAF%";
                 String romKey = "%ROM%";
                 String romProviderKey = "%ROMPROVIDER%";
 
-                ArrayList<String> keys = CollUtil.newArrayList(romKey, romsafKey, romProviderKey);
-                if (CollUtil.contains(keys, data)) return;
-
-                String new_data = data;
+                String new_data = text;
 
                 String quotationKey = "%QUOTATION%";
-                if (StrUtil.contains(data, quotationKey)) {
-                    new_data = data.replace(quotationKey, "\"");
+                if (StrUtil.contains(text, quotationKey)) {
+                    new_data = text.replace(quotationKey, "\"");
                 }
 
-                Log.i(HookParams.LOG_TAG, "new_data:" + new_data);
-                if (StrUtil.contains(new_data, romKey)) {
+                if (StrUtil.contains(new_data, romKey) && !new_data.equals(romKey)) {
                     new_data = new_data.replace(romKey, path);
-                } else if (StrUtil.contains(new_data, romsafKey)) {
-                    Method getSAFFileURI = XposedHelpers.findMethodBestMatch(mainActivityClass, "getSAFFileURI", String.class, String.class);
-                    String romsaf = ReflectUtil.invoke(null, getSAFFileURI, path, systemPath);
+                } else if (StrUtil.contains(new_data, romsafKey) && !new_data.equals(romsafKey)) {
+                    String romsaf = getRomsaf(path, systemPath);
                     Log.i(HookParams.LOG_TAG, "romsaf:" + romsaf);
                     if (StrUtil.isNotBlank(romsaf)) {
                         new_data = new_data.replace(romsafKey, romsaf);
                     }
-                } else if (StrUtil.contains(new_data, romProviderKey)) {
-                    Class<?> bclass = XposedHelpers.findClass("androidx.core.content.b", lpparam.classLoader);
-
-                    Class<?> beanClass = XposedHelpers.findClass("org.libsdl.app.SDLActivity", lpparam.classLoader);
-                    Field tField = ReflectUtil.getField(beanClass, "t");
-                    Object t = ReflectUtil.getStaticFieldValue(tField);
-
-                    Method method = ReflectUtil.getMethod(bclass, "getUriForFile", tField.getType(), String.class, File.class);
-                    String romProvider = ReflectUtil.invokeStatic(method, t, "org.es_de.frontend.files", new File(path)).toString() ;
-
+                } else if (StrUtil.contains(new_data, romProviderKey) && !new_data.equals(romProviderKey)) {
+                    String romProvider = getRomProvider(path);
                     Log.i(HookParams.LOG_TAG, "romProvider:" + romProvider);
                     if (StrUtil.isNotBlank(romProvider)) {
                         new_data = new_data.replace(romProviderKey, romProvider);
                     }
                 }
-                Log.i(HookParams.LOG_TAG, "new_data:" + new_data);
+                return new_data;
+            }
 
-                param.args[5] = new_data;
+            private String getRomsaf(String path, String systemPath) {
+                Method getSAFFileURI = XposedHelpers.findMethodBestMatch(mainActivityClass, "getSAFFileURI", String.class, String.class);
+                return ReflectUtil.invoke(null, getSAFFileURI, path, systemPath);
+            }
 
+            private String getRomProvider(String path) {
+                // TODO: 支持版本更新
+                Class<?> bclass = XposedHelpers.findClass("androidx.core.content.b", lpparam.classLoader);
+
+                Class<?> beanClass = XposedHelpers.findClass("org.libsdl.app.SDLActivity", lpparam.classLoader);
+                Field tField = ReflectUtil.getField(beanClass, "t");
+                Object t = ReflectUtil.getStaticFieldValue(tField);
+
+                Method method = ReflectUtil.getMethod(bclass, "getUriForFile", tField.getType(), String.class, File.class);
+                return ReflectUtil.invokeStatic(method, t, "org.es_de.frontend.files", new File(path)).toString();
             }
 
             public void bak(MethodHookParam param) {
@@ -135,5 +148,6 @@ public class EsDeHook {
 
         });
     }
+
 
 }
