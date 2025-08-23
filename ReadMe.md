@@ -14,6 +14,12 @@
 
 [NoRoot](doc/NoRoot.md)
 
+
+## 关于遮罩适配
+
+[遮罩](doc/Overlay.md)
+
+
 ## ES-DE 自定义配置
 
 [配置](https://github.com/EagleFlyInSky/ES-DE-Custom)
@@ -39,7 +45,5 @@
 [游戏梦工厂](doc/GameDreamFactory.md)
 
 [Tyranor](doc/Tyranor.md)
-
-
 
 
