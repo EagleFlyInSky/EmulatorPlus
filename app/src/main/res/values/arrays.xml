@@ -5,6 +5,8 @@
 
         <!-- ES-DE -->
         <item>org.es_de.frontend</item>
+        <!-- Beacon -->
+        <item>com.radikal.gamelauncher</item>
         <!-- RPG -->
         <item>com.aopaop.app</item>
         <item>net.miririt.maldivesplayer</item>
@@ -12,16 +14,18 @@
         <item>cyou.joiplay.runtime.ruffle</item>
         <item>cyou.joiplay.runtime.rpgmaker</item>
         <item>com.akira.tyranoemu</item>
-        <!-- 游戏梦工厂 -->
-        <item>com.GameDreamFactoryAndroid</item>
         <!-- moonlight -->
         <item>com.limelight</item>
         <item>com.limelight.debug</item>
+        <!-- exagear -->
+        <item>com.ludashi.benchmark</item>
         <!-- Winlator -->
         <item>com.winlator</item>
-        <item>com.wb64</item>
-        <item>com.WineBox64</item>
-        <item>com.winlatorA</item>
-        <item>com.winlatorB</item>
+        <!-- aethersx2 -->
+        <item>xyz.aethersx2.android</item>
+        <!-- dolphin -->
+        <item>org.dolphinemu.dolphinemu</item>
+        <!-- 游戏梦工厂 -->
+        <item>com.GameDreamFactoryAndroid</item>
     </string-array>
 </resources>

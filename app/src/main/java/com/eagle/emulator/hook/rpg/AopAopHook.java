@@ -10,8 +10,16 @@ import android.widget.Toast;
 
 import com.eagle.emulator.hook.HookParams;
 
+import org.luckypray.dexkit.DexKitBridge;
+import org.luckypray.dexkit.query.FindClass;
+import org.luckypray.dexkit.query.matchers.ClassMatcher;
+import org.luckypray.dexkit.query.matchers.FieldMatcher;
+import org.luckypray.dexkit.query.matchers.FieldsMatcher;
+import org.luckypray.dexkit.result.ClassData;
+import org.luckypray.dexkit.result.FieldData;
+
 import java.io.Serializable;
-import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import cn.hutool.core.convert.Convert;
@@ -27,6 +35,10 @@ public class AopAopHook {
     public static final String CLASS_NAME = "com.aopaop.app.module.game.local.GamePlayerBridgeActivity";
     public static final String HOOK_CLASS_NAME_M = "com.aopaop.app.module.common.MainActivity";
     public static final String HOOK_CLASS_NAME_S = "com.aopaop.app.module.common.SplashActivity";
+
+    static {
+        System.loadLibrary("dexkit");
+    }
 
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
 
@@ -80,8 +92,8 @@ public class AopAopHook {
                 }
 
                 // 文件夹格式路径修正
-                if (FileUtil.isDirectory(gamePath)) {
-                    gamePath = gamePath + "/www";
+                if (FileUtil.getSuffix(gamePath).equals("aopaop")) {
+                    gamePath = FileUtil.getParent(gamePath, 1);
                 }
 
                 // 获取本地游戏列表
@@ -120,16 +132,32 @@ public class AopAopHook {
              * 获取游戏列表
              * @return 游戏列表
              */
-            private List<?> getList() {
-                Class<?> storeClass = XposedHelpers.findClass("k.b", lpparam.classLoader);
-                Field a = ReflectUtil.getField(storeClass, "a");
-                Object boxStore = ReflectUtil.getStaticFieldValue(a);
+            private List<?> getList() throws Exception {
+                Object boxStore = findStore();
+
                 Class<?> gameEntityClass = XposedHelpers.findClass("com.aopaop.app.entity.game.LocalGameEntity", lpparam.classLoader);
                 Object box = ReflectUtil.invoke(boxStore, "boxFor", gameEntityClass);
                 Object queryResult = ReflectUtil.invoke(box, "query");
                 Object buildResult = ReflectUtil.invoke(queryResult, "build");
                 Object listObject = ReflectUtil.invoke(buildResult, "find");
                 return Convert.toList(listObject);
+            }
+
+            private Object findStore() {
+                String apkPath = lpparam.appInfo.sourceDir;
+
+                try (DexKitBridge bridge = DexKitBridge.create(apkPath)) {
+                    FieldsMatcher fieldsMatcher = FieldsMatcher.create().add(FieldMatcher.create().modifiers(Modifier.PUBLIC | Modifier.STATIC).type("io.objectbox.BoxStore")).count(1);
+                    ClassMatcher classMatcher = ClassMatcher.create().fields(fieldsMatcher);
+                    FindClass matcher = FindClass.create().matcher(classMatcher);
+                    ClassData storeClassData = bridge.findClass(matcher).single();
+                    FieldData fieldData = storeClassData.getFields().get(0);
+                    return ReflectUtil.getStaticFieldValue(fieldData.getFieldInstance(lpparam.classLoader));
+                } catch (Throwable e) {
+                    Log.e(HookParams.LOG_TAG, e.toString());
+                    return null;
+                }
+
             }
 
 

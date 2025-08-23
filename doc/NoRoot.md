@@ -5,14 +5,14 @@
 这里推荐使用 Opatch ，FPA ，Lspatch 三款框架
 
 这里说明一下优缺点：
-Opatch，Lspatch 支持本地和内嵌两种模式，FPA只支持本地模式
-Opatch和FPA本地模式，不需要应用启动，Lspatch本地模式需要保持Lspatch应用一直启动
+ONPatch，LSPatch 支持本地和内嵌两种模式，FPA只支持本地模式
+ONPatch和FPA本地模式，不需要应用启动，LSPatch本地模式需要保持Lspatch应用一直启动
 
 以成功概率来说
-推荐 Opatch本地
+推荐 ONPatch本地
 
 以内嵌优先推荐方案顺序为
-Lspatch内嵌 > Opatch内嵌 > Opatch本地 > FPA本地
+LSPatch内嵌 > ONPatch内嵌 > ONPatch本地 > FPA本地
 按这个顺序尝试，直到无bug
 
 
@@ -51,7 +51,7 @@ Lspatch内嵌 > Opatch内嵌 > Opatch本地 > FPA本地
 
 ![嵌入模块](image/opatch-in3.png)
 
-该方案有一定的bug，不一定所有应用都适用，有bug时可尝试适用 lspatch 嵌入试试 或 本地模式
+该方案有一定的bug，不一定所有应用都适用，有bug时可尝试适用 LSPatch 嵌入试试 或 本地模式
 
 
 

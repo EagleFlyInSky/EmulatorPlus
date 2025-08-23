@@ -95,7 +95,6 @@ public class MaldiVesHook {
 
     public static Uri fixUri(Uri uri) {
         String uriString = uri.toString();
-
         // 提取 document 后面的路径部分
         String afterDocument = uriString.substring(uriString.indexOf("document/") + "document/".length());
 

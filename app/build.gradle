@@ -37,9 +37,13 @@ android {
 }
 
 dependencies {
+    implementation libs.androidx.fragment
+
 
     //compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly libs.xposed.api
     implementation libs.hutool.core
+    implementation libs.dexkit
+    implementation libs.kotlin.stdlib
 
 }
