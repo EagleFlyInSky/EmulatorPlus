@@ -4,7 +4,11 @@
 
 以下是需要的工具
 
+[Root方案](RunRoot.md)
+
 [SukiSU](https://github.com/SukiSU-Ultra/SukiSU-Ultra)
+
+安装 LSPosed
 
 [LSPosed](https://github.com/JingMatrix/LSPosed)
 

@@ -32,8 +32,6 @@
 
 [Dolphin](doc/Dolphion.md)
 
-[Dolphin](doc/Dolphion.md)
-
 [AetherSX2/NetherSX2](doc/NetherSX2.md)
 
 ## 适配中
