@@ -5,7 +5,7 @@ plugins {
 android {
     namespace 'com.eagle.emulator'
     compileSdk 34
-    version "1.0.0"
+    version "1.0.1"
 
     defaultConfig {
         applicationId "com.eagle.emulator"
