@@ -27,8 +27,6 @@ public class JoiPlayHook {
     public static final String HOOK_CLASS_NAME = "cyou.joiplay.joiplay.activities.SplashActivity";
 
 
-
-
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
         hookStart(lpparam);
     }
@@ -142,8 +140,6 @@ public class JoiPlayHook {
         File file = new File(internalStorageDir, "configuration/games.json");
         return FileUtil.readString(file, StandardCharsets.UTF_8);
     }
-
-
 
 
 }

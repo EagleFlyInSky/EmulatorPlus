@@ -35,16 +35,16 @@ public class MoonlightHook {
                 JSONObject info = IniUtil.parseIni(path);
 
                 String appId = info.getString("AppId");
-                if (StrUtil.isNotBlank(appId)) intent.putExtra("AppId",appId);
+                if (StrUtil.isNotBlank(appId)) intent.putExtra("AppId", appId);
 
                 String uuid = info.getString("UUID");
-                if (StrUtil.isNotBlank(uuid)) intent.putExtra("UUID",uuid);
+                if (StrUtil.isNotBlank(uuid)) intent.putExtra("UUID", uuid);
 
                 String appName = info.getString("AppName");
-                if (StrUtil.isNotBlank(appName)) intent.putExtra("AppName",appName);
+                if (StrUtil.isNotBlank(appName)) intent.putExtra("AppName", appName);
 
                 Boolean hdr = info.getBoolean("HDR");
-                if (ObjUtil.isNotEmpty(hdr)) intent.putExtra("HDR",hdr);
+                if (ObjUtil.isNotEmpty(hdr)) intent.putExtra("HDR", hdr);
             }
         });
 

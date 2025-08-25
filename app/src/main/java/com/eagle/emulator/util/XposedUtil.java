@@ -1,6 +1,7 @@
 package com.eagle.emulator.util;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AndroidAppHelper;
 import android.content.Context;
 import android.content.res.Resources;
@@ -27,11 +28,16 @@ public class XposedUtil {
         }
     }
 
-
     @SuppressLint("DiscouragedApi")
     public static int getResourceId(String name, XC_LoadPackage.LoadPackageParam lpparam) {
         Resources res = AndroidAppHelper.currentApplication().getResources();
         String packageName = lpparam.packageName;
         return res.getIdentifier(name, "id", packageName);
+    }
+
+    @SuppressLint("DiscouragedApi")
+    public static int getResourceId2(String name, XC_LoadPackage.LoadPackageParam lpparam, Activity activity) {
+        Resources res = activity.getResources();
+        return res.getIdentifier(name, "id", lpparam.packageName);
     }
 }

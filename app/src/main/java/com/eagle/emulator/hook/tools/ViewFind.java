@@ -36,6 +36,7 @@ public class ViewFind {
     public static void log(View rootView) {
         ViewFind.logView(rootView, "", (view, parent) -> {
             String msg = parent + ":" + view.getClass().getSimpleName() + view.getId();
+//            view.setBackground(Drawable.createFromPath("/storage/emulated/0/Android/data/com.aopaop.app/files/overlay/default.png"));
             Log.i(HookParams.LOG_TAG, msg);
             return msg;
         });

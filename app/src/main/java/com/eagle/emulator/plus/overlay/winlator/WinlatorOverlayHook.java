@@ -8,13 +8,11 @@ import android.view.ViewGroup;
 
 import com.eagle.emulator.hook.HookParams;
 import com.eagle.emulator.hook.windows.WinlatorHook;
-import com.eagle.emulator.plus.overlay.OverlayConfig;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.nio.file.Paths;
 
-import cn.hutool.core.util.StrUtil;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class WinlatorOverlayHook extends OverlayHook {
@@ -22,15 +20,14 @@ public class WinlatorOverlayHook extends OverlayHook {
     public static final String HOOK_CLASS_NAME = "com.winlator.XServerDisplayActivity";
 
     public WinlatorOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam);
+        super(lpparam, HOOK_CLASS_NAME);
+    }
 
+
+    @Override
+    protected String getConfigPath() {
         String absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String configPath = Paths.get(absolutePath, "Android", "data", HookParams.WINLATOR, "files", "overlay").toString();
-        if (StrUtil.isNotBlank(configPath)) {
-            config = new OverlayConfig(configPath);
-        }
-
-        hookClassName = HOOK_CLASS_NAME;
+        return Paths.get(absolutePath, "Android", "data", HookParams.WINLATOR, "files", "overlay").toString();
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.eagle.emulator.plus.overlay.joiplay;
 import android.app.Activity;
 import android.os.Environment;
 
-import com.eagle.emulator.plus.overlay.OverlayConfig;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 
 import java.nio.file.Paths;
@@ -13,13 +12,19 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public abstract class JoiPlayOverlayHook extends OverlayHook {
 
-    public JoiPlayOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam);
-        String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String configPath = Paths.get(sdcardPath, "JoiPlay", "overlay").toString();
-        config = new OverlayConfig(configPath);
+    public JoiPlayOverlayHook(XC_LoadPackage.LoadPackageParam lpparam, String hookClassName) {
+        super(lpparam, hookClassName);
     }
 
+    public JoiPlayOverlayHook(XC_LoadPackage.LoadPackageParam lpparam, String hookClassName, boolean dexkit) {
+        super(lpparam, hookClassName, dexkit);
+    }
+
+    @Override
+    protected String getConfigPath() {
+        String sdcardPath = Environment.getExternalStorageDirectory().getAbsolutePath();
+        return Paths.get(sdcardPath, "JoiPlay", "overlay").toString();
+    }
 
     @Override
     public String getName(Activity activity) {

@@ -15,11 +15,11 @@ public class IniUtil {
         List<String> lines = FileUtil.readLines(path, StandardCharsets.UTF_8);
         JSONObject object = new JSONObject();
         for (String line : lines) {
-            if (StrUtil.contains(line, "=")){
+            if (StrUtil.contains(line, "=")) {
                 String[] split = line.split("=");
                 String key = split[0];
                 String value = split[1];
-                object.put(key,value);
+                object.put(key, value);
             }
         }
         return object;

@@ -23,7 +23,9 @@ public class HookParams {
 
     public static final String GAME_DREAM_FACTORY = "com.GameDreamFactoryAndroid";
 
-    public static final String EXAGEAR = "com.ludashi.benchmark";
+    public static final String LUDASHI = "com.ludashi.benchmark";
+
+    public static final String EXAGEAR = "com.ludashi.benchmara";
 
 
     public static final String ES_DE = "org.es_de.frontend";

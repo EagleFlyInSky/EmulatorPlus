@@ -14,7 +14,9 @@ import com.eagle.emulator.hook.rpg.MaldiVesHook;
 import com.eagle.emulator.hook.windows.ExgearHook;
 import com.eagle.emulator.hook.windows.MoonlightHook;
 import com.eagle.emulator.hook.windows.WinlatorHook;
+import com.eagle.emulator.plus.overlay.aopaop.AopAopOverlayHook;
 import com.eagle.emulator.plus.overlay.dolphin.DolphinOverlayHook;
+import com.eagle.emulator.plus.overlay.exagear.ExagearOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.HtmlOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.RpgOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.RuffleOverlayHook;
@@ -28,8 +30,17 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class MainHook implements IXposedHookLoadPackage {
 
     @Override
-    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
+    public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
 
+        try {
+            handle(lpparam);
+        } catch (Exception e) {
+            Log.e(HookParams.LOG_TAG, "代码异常", e);
+        }
+
+    }
+
+    private static void handle(XC_LoadPackage.LoadPackageParam lpparam) {
         String packageName = lpparam.packageName;
 
         if (StrUtil.isBlank(packageName)) return;
@@ -51,6 +62,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 break;
             case HookParams.AOPAOP:
                 AopAopHook.hook(lpparam);
+                new AopAopOverlayHook(lpparam).hook();
                 break;
             case HookParams.MALDIVES:
                 MaldiVesHook.hook(lpparam);
@@ -80,6 +92,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 break;
             case HookParams.EXAGEAR:
                 ExgearHook.hook(lpparam);
+                new ExagearOverlayHook(lpparam).hook();
                 break;
             case HookParams.WINLATOR:
                 // 前端启动
@@ -94,6 +107,5 @@ public class MainHook implements IXposedHookLoadPackage {
                     break;
                 }
         }
-
     }
 }

@@ -11,8 +11,7 @@ public class RuffleOverlayHook extends JoiPlayOverlayHook {
     public static final String HOOK_CLASS_NAME = "cyou.joiplay.runtime.ruffle.MainActivity";
 
     public RuffleOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam);
-        hookClassName = HOOK_CLASS_NAME;
+        super(lpparam, HOOK_CLASS_NAME);
     }
 
     @Override

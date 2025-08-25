@@ -16,6 +16,7 @@ import java.util.List;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.ReflectUtil;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -24,13 +25,17 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
 public class ExgearHook {
 
 
-    public static final String PACKAGE_NAME = "com.ludashi.benchmark";
-    public static final String CLASS_NAME = "com.ludashi.benchmark.activities.EDStartupActivity";
-    public static final String HOOK_CLASS_NAME = "com.ludashi.benchmark.activities.EDMainActivity";
+    public static final String PACKAGE_NAME = "com.ludashi.benchmara";
+    public static final String CLASS_NAME = PACKAGE_NAME + ".activities.EDStartupActivity";
+
+    public static final String HOOK_CLASS_NAME = PACKAGE_NAME + ".activities.EDMainActivity";
     public static final String CONTAINER_ID = "container_id";
     public static final String ABSOLUTE_PATH = "desktop_file_absolute_path";
 
-    public static String SHORTCUT_NAME;
+    /**
+     * 数据传递
+     */
+    public static String currentName;
 
 
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -57,7 +62,6 @@ public class ExgearHook {
 
             private void hook(MethodHookParam param) throws Throwable {
                 Activity activity = (Activity) param.thisObject;
-
 
                 List<?> nodeList = getNodeList(activity);
 
@@ -89,6 +93,7 @@ public class ExgearHook {
                 }
             }
 
+            @SuppressWarnings("unused")
             private Object findShortcut(Activity activity, String shortcutName) throws Throwable {
                 List<?> list = getNodeList(activity);
 
@@ -116,7 +121,7 @@ public class ExgearHook {
 
                 List<?> fragments = Convert.toList(fragmentList);
 
-                String fragmentClassName = "com.ludashi.benchmark.fragments.ChooseXDGLinkFragment";
+                String fragmentClassName = PACKAGE_NAME + ".fragments.ChooseXDGLinkFragment";
                 Object fragment = fragments.stream().filter(e -> fragmentClassName.equals(e.getClass().getName())).findFirst().get();
 
                 Class<?> fragmentClass = XposedHelpers.findClass(fragmentClassName, lpparam.classLoader);
@@ -135,11 +140,6 @@ public class ExgearHook {
 
         XposedHelpers.findAndHookMethod(startClass, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                super.afterHookedMethod(param);
-            }
-
-            @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
                 // 获取执行对象
@@ -155,9 +155,38 @@ public class ExgearHook {
                     String text = FileUtil.readString(data, StandardCharsets.UTF_8);
                     JSONObject jsonObject = new JSONObject(text);
                     activity.getIntent().putExtra(CONTAINER_ID, jsonObject.getLong(CONTAINER_ID));
-                    activity.getIntent().putExtra(ABSOLUTE_PATH, jsonObject.getString(ABSOLUTE_PATH));
+                    String path = jsonObject.getString(ABSOLUTE_PATH);
+                    activity.getIntent().putExtra(ABSOLUTE_PATH, path);
+                    ExgearHook.currentName = FileNameUtil.mainName(path);
                 }
             }
         });
+
+        Class<?> mainClass = XposedHelpers.findClass(HOOK_CLASS_NAME, lpparam.classLoader);
+        Class<?> linkClass = XposedHelpers.findClass(PACKAGE_NAME + ".XDGLink", lpparam.classLoader);
+
+        XposedHelpers.findAndHookMethod(mainClass, "onXDGLinkSelected", linkClass, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                // 获取执行对象
+                Activity activity = (Activity) param.thisObject;
+                Log.i(HookParams.LOG_TAG, "onXDGLinkSelected :" + activity.getClass().getName());
+                // 确认是对象类型
+                String name = activity.getClass().getName();
+                if (!name.equals(HOOK_CLASS_NAME)) {
+                    return;
+                }
+
+                Object link = param.args[0];
+                File file = (File) XposedHelpers.getObjectField(link, "linkFile");
+                String path = file.getAbsolutePath();
+                ExgearHook.currentName = FileNameUtil.mainName(path);
+
+            }
+        });
+
     }
+
+
 }

@@ -1,19 +1,17 @@
 package com.eagle.emulator.plus.overlay.dolphin;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.eagle.emulator.hook.HookParams;
-import com.eagle.emulator.plus.overlay.OverlayConfig;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 
 import java.nio.file.Paths;
 
 import cn.hutool.core.io.file.FileNameUtil;
-import cn.hutool.core.util.StrUtil;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -24,16 +22,13 @@ public class DolphinOverlayHook extends OverlayHook {
     public static final String HOOK_CLASS_NAME = "org.dolphinemu.dolphinemu.activities.EmulationActivity";
 
     public DolphinOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam);
+        super(lpparam, HOOK_CLASS_NAME);
+    }
 
+    @Override
+    protected String getConfigPath() {
         String absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-        String configPath = Paths.get(absolutePath, "Android", "data", HookParams.DOLPHIN, "files", "overlay").toString();
-        if (StrUtil.isNotBlank(configPath)) {
-            config = new OverlayConfig(configPath);
-        }
-
-        hookClassName = HOOK_CLASS_NAME;
-
+        return Paths.get(absolutePath, "Android", "data", HookParams.DOLPHIN, "files", "overlay").toString();
     }
 
     public void hook() {
@@ -50,9 +45,25 @@ public class DolphinOverlayHook extends OverlayHook {
     }
 
     @Override
-    @SuppressLint("ResourceType")
     public View getView(Activity activity) {
-        return activity.findViewById(2131362585);
+
+        ViewGroup content = activity.findViewById(android.R.id.content);
+        if (content == null) {
+            return null;
+        }
+        ViewGroup layout1 = (ViewGroup) content.getChildAt(0);
+        if (layout1 == null) {
+            return null;
+        }
+        ViewGroup layout2 = (ViewGroup) layout1.getChildAt(0);
+        if (layout2 == null) {
+            return null;
+        }
+        ViewGroup layout3 = (ViewGroup) layout2.getChildAt(0);
+        if (layout3 == null) {
+            return null;
+        }
+        return layout3.getChildAt(1);
     }
 
     @Override
