@@ -4,12 +4,14 @@
 
 ## 配置路径
 
-| 软件        | 配置文件夹                                                                    |
-|-----------|--------------------------------------------------------------------------|
-| Winlator  | /storage/emulated/0/Android/data/com.winlator/files/overlay              |
-| NetherSX2 | /storage/emulated/0/Android/data/xyz.aethersx2.android/files/overlay     |
-| Dolphin   | /storage/emulated/0/Android/data/org.dolphinemu.dolphinemu/files/overlay |
-| Joiplay   | /storage/emulated/0/JoiPlay/overlay                                      |
+| 软件                        | 配置文件夹                                                                    |
+|---------------------------|--------------------------------------------------------------------------|
+| [Winlator](Winlator.md)   | /storage/emulated/0/Android/data/com.winlator/files/overlay              |
+| [NetherSX2](NetherSX2.md) | /storage/emulated/0/Android/data/xyz.aethersx2.android/files/overlay     |
+| [Dolphin](Dolphin.md)     | /storage/emulated/0/Android/data/org.dolphinemu.dolphinemu/files/overlay |
+| [Joiplay](JoiPlay.md)     | /storage/emulated/0/JoiPlay/overlay                                      |
+| [AopAop](AopAop.md)       | /storage/emulated/0/Android/data/com.aopaop.app/files/overlay            |
+| [Exagear](Exagear.md)     | /storage/emulated/0/Android/data/com.ludashi.benchmara/files/overlay     |
 
 ## 配置名称
 
@@ -19,8 +21,10 @@
 |-----------|--------------------|
 | Winlator  | 软件内快捷方式名称（可在软件内修改） |
 | Joiplay   | 软件内游戏名称（可在软件内修改）   |
+| AopAop    | 软件内游戏名称（可在软件内修改）   |
 | NetherSX2 | rom文件名称（不含后缀）      |
 | Dolphin   | rom文件名称（不含后缀）      |
+| Exagear   | 软件内快捷方式文件名称        |
 
 ## 配置方法
 

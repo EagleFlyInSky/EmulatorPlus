@@ -36,7 +36,7 @@
 
 [游戏梦工厂](doc/GameDreamFactory.md)
 
-[Dolphin](doc/Dolphion.md)
+[Dolphin](doc/Dolphin)
 
 [AetherSX2/NetherSX2](doc/NetherSX2.md)
 
