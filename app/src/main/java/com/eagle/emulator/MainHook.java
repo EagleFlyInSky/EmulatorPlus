@@ -15,6 +15,7 @@ import com.eagle.emulator.hook.windows.ExgearHook;
 import com.eagle.emulator.hook.windows.MoonlightHook;
 import com.eagle.emulator.hook.windows.WinlatorHook;
 import com.eagle.emulator.plus.overlay.aopaop.AopAopOverlayHook;
+import com.eagle.emulator.plus.overlay.azahar.AzaharOverlayHook;
 import com.eagle.emulator.plus.overlay.dolphin.DolphinOverlayHook;
 import com.eagle.emulator.plus.overlay.exagear.ExagearOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.HtmlOverlayHook;
@@ -53,6 +54,9 @@ public class MainHook implements IXposedHookLoadPackage {
                 break;
             case HookParams.BEACON:
                 BeaconHook.hook(lpparam);
+                break;
+            case HookParams.AZAHAR:
+                new AzaharOverlayHook(lpparam).hook();
                 break;
             case HookParams.NETHERSX2:
                 new NetherSX2OverlayHook(lpparam).hook();

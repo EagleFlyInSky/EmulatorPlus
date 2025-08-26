@@ -2,15 +2,14 @@ package com.eagle.emulator.plus.overlay.exagear;
 
 import android.app.Activity;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 
-import com.eagle.emulator.hook.HookParams;
 import com.eagle.emulator.hook.windows.ExgearHook;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
@@ -33,7 +32,7 @@ public class ExagearOverlayHook extends OverlayHook {
 
     @Override
     protected View getView(Activity activity) {
-        int resourceId = XposedUtil.getResourceId2("mainView", lpparam, activity);
+        int resourceId = XposedUtil.getResourceId("mainView", lpparam, activity);
         return activity.findViewById(resourceId);
     }
 
@@ -45,16 +44,12 @@ public class ExagearOverlayHook extends OverlayHook {
     }
 
     @Override
-    public void hook() {
-        if (config != null) {
-            Log.i(HookParams.LOG_TAG, "Hook遮罩方法开始：" + hookClassName);
-            XposedHelpers.findAndHookMethod("com.eltechs.axs.activities.XServerDisplayActivity", lpparam.classLoader, "onResume", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    handler(param);
-                }
-            });
-        }
+    public void hookMethod(Consumer<XC_MethodHook.MethodHookParam> consumer) {
+        XposedHelpers.findAndHookMethod("com.eltechs.axs.activities.XServerDisplayActivity", lpparam.classLoader, "onResume", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                consumer.accept(param);
+            }
+        });
     }
 }

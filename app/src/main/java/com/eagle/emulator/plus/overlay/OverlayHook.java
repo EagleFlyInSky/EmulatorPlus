@@ -14,6 +14,7 @@ import org.luckypray.dexkit.query.matchers.FieldMatcher;
 import org.luckypray.dexkit.result.FieldData;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -37,14 +38,18 @@ public abstract class OverlayHook {
         this.hookClassName = hookClassName;
         this.hookClass = XposedHelpers.findClass(hookClassName, lpparam.classLoader);
 
-        String configPath = getConfigPath();
-        if (StrUtil.isNotBlank(configPath)) {
-            config = new OverlayConfig(configPath);
-        }
+        initConfig();
 
         if (dexkit) {
             System.loadLibrary("dexkit");
             initFindField();
+        }
+    }
+
+    protected void initConfig() {
+        String configPath = getConfigPath();
+        if (StrUtil.isNotBlank(configPath)) {
+            config = new BaseOverlayConfig(configPath);
         }
     }
 
@@ -92,18 +97,30 @@ public abstract class OverlayHook {
         }
     }
 
-    public void hook() {
+    public final void hook() {
         if (config != null) {
             Log.i(HookParams.LOG_TAG, "Hook遮罩方法开始：" + hookClassName);
-            XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    Log.i(HookParams.LOG_TAG, "Hook遮罩方法运行");
-                    super.afterHookedMethod(param);
-                    handler(param);
-                }
+            hookMethod(param -> {
+                Log.i(HookParams.LOG_TAG, "Hook遮罩方法运行");
+                handler(param);
             });
+            hookPlus();
+        } else {
+            Log.i(HookParams.LOG_TAG, "遮罩配置为空");
         }
+    }
+
+    public void hookPlus() {
+    }
+
+
+    public void hookMethod(Consumer<XC_MethodHook.MethodHookParam> consumer) {
+        XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                consumer.accept(param);
+            }
+        });
     }
 
 
@@ -119,8 +136,15 @@ public abstract class OverlayHook {
         View view = getView(activity);
         if (view != null) {
             Log.i(HookParams.LOG_TAG, "view :" + view.getClass().getSimpleName() + "-" + view.getId());
-            String name = getName(activity);
-            String overlayImage = config.getOverlayImage(name);
+
+            GameInfo gameInfo = getGameInfo(activity);
+            if (gameInfo == null) {
+                return;
+            }
+
+            String overlayImage = config.getOverlayImage(gameInfo);
+
+            String name = gameInfo.getName();
             Log.i(HookParams.LOG_TAG, name + ":" + overlayImage);
 
             if (StrUtil.isNotBlank(overlayImage)) {
@@ -136,6 +160,10 @@ public abstract class OverlayHook {
     protected abstract View getView(Activity activity);
 
     protected abstract String getName(Activity activity);
+
+    protected GameInfo getGameInfo(Activity activity) {
+        return new GameInfo(getName(activity));
+    }
 
 
 }

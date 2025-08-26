@@ -40,6 +40,10 @@
 
 [AetherSX2/NetherSX2](doc/NetherSX2.md)
 
+[Exagear](doc/Exagear.md)
+
+[Azahar](doc/Azahar.md)
+
 ## 适配中
 
 [游戏梦工厂](doc/GameDreamFactory.md)

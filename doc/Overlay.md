@@ -11,7 +11,24 @@
 | [Dolphin](Dolphin.md)     | /storage/emulated/0/Android/data/org.dolphinemu.dolphinemu/files/overlay |
 | [Joiplay](JoiPlay.md)     | /storage/emulated/0/JoiPlay/overlay                                      |
 | [AopAop](AopAop.md)       | /storage/emulated/0/Android/data/com.aopaop.app/files/overlay            |
+| [Azahar](Azahar.md)       | /storage/emulated/0/Android/data/io.github.lime3ds.android/files/overlay |
 | [Exagear](Exagear.md)     | /storage/emulated/0/Android/data/com.ludashi.benchmara/files/overlay     |
+
+### 关于Azahar的特殊说明
+
+因为要支持Azahar的布局切换，Azahar配置目录下有一层布局文件夹，目前只支持了横向布局
+
+|      文件夹      |  布局   |
+|:-------------:|:-----:|
+|   original    |  原始   |
+| single_screen | 单个屏幕  |
+| large_screen  |  大屏幕  |
+|  side_screen  | 并排屏幕  |
+| hybrid_screen | 混合式屏幕 |
+| custom_layout | 自定义布局 |
+
+在 `/storage/emulated/0/Android/data/io.github.lime3ds.android/files/overlay`
+文件夹下有以上6个布局文件夹，在每个文件夹下按下面教程 [配置方法](#配置方法) 配置
 
 ## 配置名称
 
@@ -24,6 +41,7 @@
 | AopAop    | 软件内游戏名称（可在软件内修改）   |
 | NetherSX2 | rom文件名称（不含后缀）      |
 | Dolphin   | rom文件名称（不含后缀）      |
+| Azahar    | rom文件名称（不含后缀）      |
 | Exagear   | 软件内快捷方式文件名称        |
 
 ## 配置方法

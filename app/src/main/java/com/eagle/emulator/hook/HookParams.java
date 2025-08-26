@@ -38,6 +38,8 @@ public class HookParams {
 
     public static final String DOLPHIN = "org.dolphinemu.dolphinemu";
 
+    public static final String AZAHAR = "io.github.lime3ds.android";
+
     public static final String WINLATOR = "com.winlator";
 
 

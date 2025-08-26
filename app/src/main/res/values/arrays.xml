@@ -28,5 +28,9 @@
         <item>org.dolphinemu.dolphinemu</item>
         <!-- 游戏梦工厂 -->
         <item>com.GameDreamFactoryAndroid</item>
+        <!-- Azahar -->
+        <item>io.github.lime3ds.android</item>
+
+
     </string-array>
 </resources>

@@ -2,7 +2,6 @@ package com.eagle.emulator.plus.overlay.dolphin;
 
 import android.app.Activity;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -10,6 +9,7 @@ import com.eagle.emulator.hook.HookParams;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import cn.hutool.core.io.file.FileNameUtil;
 import de.robv.android.xposed.XC_MethodHook;
@@ -31,17 +31,14 @@ public class DolphinOverlayHook extends OverlayHook {
         return Paths.get(absolutePath, "Android", "data", HookParams.DOLPHIN, "files", "overlay").toString();
     }
 
-    public void hook() {
-        if (config != null) {
-            Log.i(HookParams.LOG_TAG, "Hook遮罩方法开始：" + hookClassName);
-            XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onResume", new XC_MethodHook() {
-                @Override
-                protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                    super.afterHookedMethod(param);
-                    handler(param);
-                }
-            });
-        }
+    @Override
+    public void hookMethod(Consumer<XC_MethodHook.MethodHookParam> consumer) {
+        XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onResume", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                consumer.accept(param);
+            }
+        });
     }
 
     @Override

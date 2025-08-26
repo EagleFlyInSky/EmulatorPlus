@@ -33,7 +33,7 @@ public class WinlatorOverlayHook extends OverlayHook {
     @Override
     @SuppressLint("ResourceType")
     public View getView(Activity activity) {
-        int resId = XposedUtil.getResourceId("FLXServerDisplay", lpparam);
+        int resId = XposedUtil.getResourceId("FLXServerDisplay", lpparam, activity);
         ViewGroup viewGroup = activity.findViewById(resId);
         return viewGroup.getChildAt(0);
     }
