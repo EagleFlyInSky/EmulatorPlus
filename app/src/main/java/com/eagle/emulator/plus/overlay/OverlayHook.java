@@ -148,11 +148,15 @@ public abstract class OverlayHook {
             Log.i(HookParams.LOG_TAG, name + ":" + overlayImage);
 
             if (StrUtil.isNotBlank(overlayImage)) {
-                view.setBackground(Drawable.createFromPath(overlayImage));
+                setBackground(view, overlayImage);
             }
         } else {
             Log.i(HookParams.LOG_TAG, "view : 空");
         }
+    }
+
+    protected void setBackground(View view, String overlayImage) {
+        view.setBackground(Drawable.createFromPath(overlayImage));
     }
 
     protected abstract String getConfigPath();

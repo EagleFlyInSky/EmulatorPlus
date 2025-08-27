@@ -34,6 +34,10 @@ android {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
     }
+
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 dependencies {
@@ -43,6 +47,7 @@ dependencies {
     //compileOnly fileTree(dir: 'libs', include: ['*.jar'])
     compileOnly libs.xposed.api
     implementation libs.hutool.core
+    implementation libs.hutool.setting
     implementation libs.dexkit
     implementation libs.kotlin.stdlib
 

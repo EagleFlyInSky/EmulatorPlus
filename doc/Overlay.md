@@ -30,6 +30,22 @@
 在 `/storage/emulated/0/Android/data/io.github.lime3ds.android/files/overlay`
 文件夹下有以上6个布局文件夹，在每个文件夹下按下面教程 [配置方法](#配置方法) 配置
 
+在 `/storage/emulated/0/Android/data/io.github.lime3ds.android/files/overlay/custom_layout`
+中的遮罩图，添加同名的ini文件,配置如下
+```ini
+LANDSCAPE_TOP_X=46
+LANDSCAPE_TOP_Y=144
+LANDSCAPE_TOP_WIDTH=1420
+LANDSCAPE_TOP_HEIGHT=840
+LANDSCAPE_BOTTOM_X=1518
+LANDSCAPE_BOTTOM_Y=694
+LANDSCAPE_BOTTOM_WIDTH=400
+LANDSCAPE_BOTTOM_HEIGHT=300
+```
+对应软件内的自定义布局设置，这样实现多个自定义布局设置
+![img.png](img.png)
+![img_1.png](img_1.png)
+
 ## 配置名称
 
 关于下面游戏名称的定义说明，在不同的软件中含义不同

@@ -1,11 +1,12 @@
 package com.eagle.emulator.plus.overlay.azahar;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+
+import androidx.annotation.NonNull;
 
 import com.eagle.emulator.hook.HookParams;
 import com.eagle.emulator.plus.overlay.GameInfo;
@@ -14,12 +15,17 @@ import com.eagle.emulator.util.HookUtil;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.setting.Setting;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -82,13 +88,28 @@ public class AzaharOverlayHook extends OverlayHook {
 
     @Override
     protected GameInfo getGameInfo(Activity activity) {
-        String s = "org.citra.citra_emu.features.settings.model.IntSetting";
-        Class<?> settingClass = XposedHelpers.findClass(s, lpparam.classLoader);
-        Field field = ReflectUtil.getField(settingClass, "SCREEN_LAYOUT");
-        Object setting = ReflectUtil.getFieldValue(null, field);
-        int code = ReflectUtil.invoke(setting, "getInt");
+        int code = getCode("SCREEN_LAYOUT");
         Log.i(HookParams.LOG_TAG, "code : " + code);
         return new GameInfo(getName(activity), code);
+    }
+
+    private int getCode(String name) {
+        Object setting = getSettingByIntSetting(name);
+        return ReflectUtil.invoke(setting, "getInt");
+    }
+
+    private void setCode(String name, int code) {
+        Object setting = getSettingByIntSetting(name);
+        ReflectUtil.invoke(setting, "setInt", code);
+    }
+
+
+    @NonNull
+    private Object getSettingByIntSetting(String name) {
+        String s = "org.citra.citra_emu.features.settings.model.IntSetting";
+        Class<?> settingClass = XposedHelpers.findClass(s, lpparam.classLoader);
+        Field field = ReflectUtil.getField(settingClass, name);
+        return ReflectUtil.getFieldValue(null, field);
     }
 
     @Override
@@ -99,7 +120,6 @@ public class AzaharOverlayHook extends OverlayHook {
 
     private void hookChangeScreen() {
         Class<?> utilClass = XposedHelpers.findClass("org.citra.citra_emu.display.ScreenAdjustmentUtil", lpparam.classLoader);
-
         XposedHelpers.findAndHookMethod(utilClass, "changeScreenOrientation", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
@@ -112,11 +132,54 @@ public class AzaharOverlayHook extends OverlayHook {
                 Log.i(HookParams.LOG_TAG, currentGame + ":" + overlayImage);
 
                 if (StrUtil.isNotBlank(overlayImage)) {
-                    view.setBackground(Drawable.createFromPath(overlayImage));
+                    setBackground(view, overlayImage);
+                    Object util = param.thisObject;
+                    Object settings = ReflectUtil.getFieldValue(util, "settings");
+                    changeLayout(overlayImage, settings);
                 } else {
                     view.setBackground(null);
                 }
             }
         });
+
+        XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+
+                Activity activity = (Activity) param.thisObject;
+                GameInfo gameInfo = getGameInfo(activity);
+                String overlayImage = config.getOverlayImage(gameInfo);
+
+                Object viewModel = ReflectUtil.invoke(activity, "getSettingsViewModel");
+                Object settings = ReflectUtil.invoke(viewModel, "getSettings");
+                changeLayout(overlayImage, settings);
+
+            }
+        });
+    }
+
+    private void changeLayout(String overlayImage, Object settings) {
+        String settingPath = overlayImage.replace("png", "ini");
+        Log.i(HookParams.LOG_TAG, "配置路径 ：" + settingPath);
+
+        if (FileUtil.exist(settingPath)) {
+            Setting setting = new Setting(FileUtil.file(settingPath), StandardCharsets.UTF_8, false);
+            Log.i(HookParams.LOG_TAG, "读取配置 ：" + setting);
+            List<String> keys = Arrays.asList("LANDSCAPE_TOP_X", "LANDSCAPE_TOP_Y", "LANDSCAPE_TOP_WIDTH", "LANDSCAPE_TOP_HEIGHT", "LANDSCAPE_BOTTOM_X", "LANDSCAPE_BOTTOM_Y", "LANDSCAPE_BOTTOM_WIDTH", "LANDSCAPE_BOTTOM_HEIGHT");
+
+            for (String key : keys) {
+                int value = setting.getInt(key);
+                setCode(key, value);
+                Object intSetting = getSettingByIntSetting(key);
+                ReflectUtil.invoke(settings, "saveSetting", intSetting, "config");
+            }
+
+            Class<?> libClass = XposedHelpers.findClass("org.citra.citra_emu.NativeLibrary", lpparam.classLoader);
+            Field field = ReflectUtil.getField(libClass, "INSTANCE");
+            Object lib = ReflectUtil.getFieldValue(null, field);
+            ReflectUtil.invoke(lib, "reloadSettings");
+        }
+
+
     }
 }
