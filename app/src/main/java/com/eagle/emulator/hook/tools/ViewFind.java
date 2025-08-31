@@ -4,7 +4,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 
 public class ViewFind {
 
@@ -36,7 +36,7 @@ public class ViewFind {
     public static void log(View rootView) {
         ViewFind.logView(rootView, "", (view, parent) -> {
             String msg = parent + ":" + view.getClass().getSimpleName() + view.getId();
-//            view.setBackground(Drawable.createFromPath("/storage/emulated/0/Android/data/io.github.lime3ds.android/files/overlay/default.png"));
+//            view.setBackground(Drawable.createFromPath("/storage/emulated/0/Android/data/com.explusalpha.SaturnEmu/files/overlay/default.png"));
             Log.i(HookParams.LOG_TAG, msg);
             return msg;
         });

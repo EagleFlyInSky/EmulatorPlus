@@ -24,6 +24,20 @@ public class HookUtil {
         });
     }
 
+
+    public static void hookToastShowByPrefix(String prefix) {
+        XposedHelpers.findAndHookMethod(Toast.class, "show", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) {
+                Toast toast = (Toast) param.thisObject;
+                String text = (String) ReflectUtil.getFieldValue(toast, "mText");
+                if (text.startsWith(prefix)) {
+                    param.setResult(null);
+                }
+            }
+        });
+    }
+
     public static void hookToastShowByResourceName(String resName, XC_LoadPackage.LoadPackageParam lpparam) {
         XposedHelpers.findAndHookMethod(Toast.class, "show", new XC_MethodHook() {
             @Override

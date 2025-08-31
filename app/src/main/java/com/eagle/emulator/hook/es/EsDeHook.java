@@ -3,7 +3,7 @@ package com.eagle.emulator.hook.es;
 import android.content.Intent;
 import android.util.Log;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -24,7 +24,7 @@ public class EsDeHook {
     public static final String HOOK_CLASS_NAME = "org.es_de.frontend.MainActivity";
 
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
-        hookStart(lpparam);
+        //hookStart(lpparam);
         hookStartLog(lpparam);
     }
 

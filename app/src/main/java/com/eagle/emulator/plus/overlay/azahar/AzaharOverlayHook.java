@@ -6,9 +6,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 import com.eagle.emulator.plus.overlay.GameInfo;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 import com.eagle.emulator.util.HookUtil;
@@ -104,7 +102,6 @@ public class AzaharOverlayHook extends OverlayHook {
     }
 
 
-    @NonNull
     private Object getSettingByIntSetting(String name) {
         String s = "org.citra.citra_emu.features.settings.model.IntSetting";
         Class<?> settingClass = XposedHelpers.findClass(s, lpparam.classLoader);
@@ -116,6 +113,7 @@ public class AzaharOverlayHook extends OverlayHook {
     public void hookPlus() {
         HookUtil.hookToastShowByResourceName("emulation_menu_help", lpparam);
         hookChangeScreen();
+        hookGameStart();
     }
 
     private void hookChangeScreen() {
@@ -142,6 +140,9 @@ public class AzaharOverlayHook extends OverlayHook {
             }
         });
 
+    }
+
+    private void hookGameStart() {
         XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {

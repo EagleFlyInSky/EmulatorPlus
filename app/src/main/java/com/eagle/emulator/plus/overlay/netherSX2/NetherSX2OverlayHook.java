@@ -5,7 +5,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.view.View;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 
 import org.luckypray.dexkit.DexKitBridge;

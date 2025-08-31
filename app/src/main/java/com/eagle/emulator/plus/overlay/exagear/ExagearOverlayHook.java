@@ -3,6 +3,9 @@ package com.eagle.emulator.plus.overlay.exagear;
 import android.app.Activity;
 import android.os.Environment;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 
 import com.eagle.emulator.hook.windows.ExgearHook;
 import com.eagle.emulator.plus.overlay.OverlayHook;
@@ -33,14 +36,16 @@ public class ExagearOverlayHook extends OverlayHook {
     @Override
     protected View getView(Activity activity) {
         int resourceId = XposedUtil.getResourceId("mainView", lpparam, activity);
-        return activity.findViewById(resourceId);
+        ViewGroup viewGroup = activity.findViewById(resourceId);
+        ImageView overlayView = new ImageView(activity);
+        overlayView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        viewGroup.addView(overlayView);
+        return overlayView;
     }
 
     @Override
     protected String getName(Activity activity) {
-        String currentName = ExgearHook.currentName;
-        ExgearHook.currentName = null;
-        return currentName;
+        return ExgearHook.currentName;
     }
 
     @Override

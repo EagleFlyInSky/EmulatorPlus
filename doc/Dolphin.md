@@ -1,6 +1,6 @@
 # Dolphin
 
-适配的官方版
+包名 `org.dolphinemu.dolphinemu` 适配的是官方版
 
 ## 软件
 

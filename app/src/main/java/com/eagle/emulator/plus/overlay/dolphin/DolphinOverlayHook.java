@@ -5,8 +5,9 @@ import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 import com.eagle.emulator.plus.overlay.OverlayHook;
+import com.eagle.emulator.util.HookUtil;
 
 import java.nio.file.Paths;
 import java.util.function.Consumer;
@@ -71,5 +72,10 @@ public class DolphinOverlayHook extends OverlayHook {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void hookPlus() {
+        HookUtil.hookToastShowByPrefix("短按返回键进入菜单。");
     }
 }

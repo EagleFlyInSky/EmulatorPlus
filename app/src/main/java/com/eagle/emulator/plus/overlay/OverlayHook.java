@@ -5,8 +5,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 
 import org.luckypray.dexkit.DexKitBridge;
 import org.luckypray.dexkit.query.FindField;
@@ -145,9 +146,9 @@ public abstract class OverlayHook {
             String overlayImage = config.getOverlayImage(gameInfo);
 
             String name = gameInfo.getName();
-            Log.i(HookParams.LOG_TAG, name + ":" + overlayImage);
 
             if (StrUtil.isNotBlank(overlayImage)) {
+                Log.i(HookParams.LOG_TAG, name + ":" + overlayImage);
                 setBackground(view, overlayImage);
             }
         } else {
@@ -156,7 +157,12 @@ public abstract class OverlayHook {
     }
 
     protected void setBackground(View view, String overlayImage) {
-        view.setBackground(Drawable.createFromPath(overlayImage));
+        Drawable drawable = Drawable.createFromPath(overlayImage);
+        if (view instanceof ImageView) {
+            ((ImageView) view).setImageDrawable(drawable);
+        } else {
+            view.setBackground(drawable);
+        }
     }
 
     protected abstract String getConfigPath();

@@ -2,7 +2,8 @@
 
 ## 软件
 
-这里适配的是官方版，包名为 com.winlator
+包名 `com.winlator` 适配的是官方版
+
 [Winlator](https://github.com/brunodev85/winlator)
 
 ## 功能

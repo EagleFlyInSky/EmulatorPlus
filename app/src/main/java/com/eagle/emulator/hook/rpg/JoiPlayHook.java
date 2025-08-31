@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;

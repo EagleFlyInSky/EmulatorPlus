@@ -6,27 +6,77 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.eagle.emulator.hook.HookParams;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.eagle.emulator.HookParams;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
+import cn.hutool.setting.Setting;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class BeaconHook {
+
+    private static final Map<String, String> MAPPINGS = new HashMap<>();
+
+    private static final Set<String> IGNORES = new HashSet<>();
+
+
+    static {
+        // 初始化名称映射关系
+        String path = "/storage/emulated/0/beacon";
+        String dirPath = Paths.get(path, "name_mapping").toString();
+        if (FileUtil.exist(dirPath) && FileUtil.isDirectory(dirPath)) {
+            File[] ls = FileUtil.ls(dirPath);
+            List<File> list = ListUtil.toList(ls);
+            for (File file : list) {
+
+                if (FileNameUtil.getSuffix(FileUtil.getName(file)).equals("ini")) {
+
+                    Setting setting = new Setting(file, StandardCharsets.UTF_8, false);
+
+                    List<String> groups = setting.getGroups();
+                    if (CollUtil.isNotEmpty(groups)) {
+                        for (String group : groups) {
+                            int groupSize = setting.keySet(group).size();
+                            if (groupSize > 0) {
+                                for (String key : setting.keySet(group)) {
+                                    String value = setting.get(group, key);
+                                    MAPPINGS.put(key, value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // 初始化忽略文件
+        File file = new File(path, "ignore.txt");
+        if (FileUtil.exist(file)) {
+            List<String> ignores = FileUtil.readLines(file, StandardCharsets.UTF_8);
+            List<String> filter = CollUtil.filter(ignores, e -> {
+                String trim = StrUtil.trim(e);
+                return !trim.startsWith("#");
+            });
+            IGNORES.addAll(filter);
+        }
+    }
+
 
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
         Log.i(HookParams.LOG_TAG, "Hook准备");
@@ -69,8 +119,6 @@ public class BeaconHook {
                 super.afterHookedMethod(param);
                 Object result = param.getResult();
                 Set<String> set = Convert.toSet(String.class, result);
-                set.add("gam4980");
-                set.add("ardens");
                 set.add("mamemess");
                 set.add("fbneo_plus");
                 List<String> list = ListUtil.toList(set);
@@ -87,7 +135,7 @@ public class BeaconHook {
     }
 
     /**
-     * hook 游戏保存 替换名称
+     * hook 游戏保存 替换名称 忽略游戏
      */
     private static void hookSave(XC_LoadPackage.LoadPackageParam lpparam) {
 
@@ -97,8 +145,6 @@ public class BeaconHook {
 
 
         XposedHelpers.findAndHookMethod(gameRepositoryClass, "save", gameClass, Set.class, continuationClass, new XC_MethodHook() {
-            JSONObject mappings;
-            List<String> ignores;
 
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -114,46 +160,39 @@ public class BeaconHook {
             }
 
             private boolean ignore(MethodHookParam param) {
-                if (ignores == null) {
-                    File file = new File("/storage/emulated/0/Beacon", "ignore.txt");
-                    if (!FileUtil.exist(file)) {
-                        return false;
-                    }
-                    ignores = FileUtil.readLines(file, StandardCharsets.UTF_8);
-                }
 
-                if (ignores != null) {
+                if (CollUtil.isNotEmpty(IGNORES)) {
                     Object object = param.args[0];
                     String name = ReflectUtil.getFieldValue(object, "name").toString();
-                    Log.i(HookParams.LOG_TAG, "游戏名称：" + name);
+                    Set<?> gameFileSet = (Set<?>) param.args[1];
 
-                    return CollUtil.contains(ignores, name);
+                    boolean isIgnore = gameFileSet.stream().allMatch(e -> {
+                        String file = e.toString();
+
+                        String decode = URLUtil.decode(file);
+                        String fileName = FileUtil.mainName(decode);
+
+                        return CollUtil.contains(IGNORES, fileName);
+                    });
+                    if (isIgnore) {
+                        Log.i(HookParams.LOG_TAG, "文件忽略：" + name);
+                    }
+                    return isIgnore;
                 }
 
                 return false;
 
             }
 
-            private void mapping(MethodHookParam param) throws JSONException {
-                if (mappings == null) {
-                    File file = new File("/storage/emulated/0/Beacon", "NameMapping.json");
-                    if (!FileUtil.exist(file)) {
-                        return;
-                    }
-                    String jsonString = FileUtil.readString(file, StandardCharsets.UTF_8);
-                    if (StrUtil.isBlank(jsonString)) {
-                        return;
-                    }
-                    mappings = new JSONObject(jsonString);
-                }
+            private void mapping(MethodHookParam param) {
 
-                if (mappings != null) {
+                if (CollUtil.isNotEmpty(MAPPINGS)) {
                     Object object = param.args[0];
                     String name = ReflectUtil.getFieldValue(object, "name").toString();
-                    Log.i(HookParams.LOG_TAG, "游戏名称：" + name);
 
-                    String mappingName = mappings.getString(name);
+                    String mappingName = MAPPINGS.get(name);
                     if (StrUtil.isNotBlank(mappingName)) {
+                        Log.i(HookParams.LOG_TAG, "游戏名称映射：" + name + "->" + mappingName);
                         ReflectUtil.setFieldValue(object, "name", mappingName);
                     }
                 }
@@ -162,7 +201,9 @@ public class BeaconHook {
 
     }
 
-
+    /**
+     * 扩展命令参数
+     */
     private static void hookGameStart(XC_LoadPackage.LoadPackageParam lpparam) {
 
         final String FILE_CONTEXT = "{file_context}";

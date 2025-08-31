@@ -6,11 +6,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import cn.hutool.core.collection.CollUtil;
@@ -35,18 +36,23 @@ public class TyranorHook {
 
     public static final List<String> TYPES = CollUtil.newArrayList(ARTEMIS, KR2, TYRANO, RMMZ, RPG, VN, WEB_OTHER);
 
-
+    /**
+     * 通过后缀获取类型
+     *
+     * @param suffix 后缀
+     * @return 类型
+     */
     public static String getType(String suffix) {
 
         String type = TYPES.stream().filter(suffix::equals).findFirst().orElse("");
 
         if (StrUtil.isNotBlank(type)) return type;
 
-        type = TYPES.stream().map(String::toLowerCase).filter(suffix::equals).findFirst().orElse("");
+        type = TYPES.stream().filter(e -> e.toLowerCase().equals(suffix)).findFirst().orElse("");
 
         if (StrUtil.isNotBlank(type)) return type;
 
-        type = TYPES.stream().map(String::toUpperCase).filter(suffix::equals).findFirst().orElse("");
+        type = TYPES.stream().filter(e -> e.toUpperCase().equals(suffix)).findFirst().orElse("");
 
         if (StrUtil.isNotBlank(type)) return type;
 
@@ -56,7 +62,7 @@ public class TyranorHook {
 
 
     public static void hook(XC_LoadPackage.LoadPackageParam lpparam) {
-        // 传递参数
+
         Class<?> clazz = XposedHelpers.findClass(HOOK_CLASS_NAME, lpparam.classLoader);
         XposedHelpers.findAndHookMethod(clazz, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
@@ -74,19 +80,15 @@ public class TyranorHook {
                 // 通过后缀判断游戏类型
                 String name = FileNameUtil.getName(path);
                 String suffix = FileNameUtil.getSuffix(name);
+                Log.i(HookParams.LOG_TAG, "suffix: " + suffix);
                 String type = getType(suffix);
+                Log.i(HookParams.LOG_TAG, "type: " + type);
                 if (StrUtil.isBlank(type)) {
                     Toast.makeText(activity, "文件后缀不是支持的游戏类型", Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                // 修正游戏路径
-                String gameDirPath = path;
-                if (FileUtil.isFile(path)) {
-                    gameDirPath = FileUtil.getParent(path, 1);
-                }
-
-                String game = getJsonObject(gameDirPath, type).toString();
+                String game = getJsonObject(path, type).toString();
                 Log.i(HookParams.LOG_TAG, "game: " + game.replace("\\/", "/"));
                 if (StrUtil.isNotBlank(game)) {
                     intent.putExtra("game", game);
@@ -96,15 +98,17 @@ public class TyranorHook {
             private JSONObject getJsonObject(String path, String type) throws JSONException {
                 JSONObject json = new JSONObject();
                 json.put("type", type);
-                if (KR2.equals(type)) {
-                    json.put("path", path + "/data.xp3");
+                String dirPath = FileUtil.getParent(path, 1);
+                String content = FileUtil.readString(path, StandardCharsets.UTF_8);
+                if (StrUtil.isNotBlank(content)) {
+                    json.put("path", dirPath + "/" + content);
                 } else {
-                    json.put("path", path);
+                    json.put("path", dirPath);
                 }
                 json.put("id", 0);
                 json.put("timestamp", 0);
                 json.put("icon", "");
-                json.put("name", FileNameUtil.getName(path));
+                json.put("name", FileNameUtil.mainName(path));
                 json.put("flags", 0);
                 return json;
             }

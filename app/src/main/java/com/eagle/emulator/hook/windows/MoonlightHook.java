@@ -4,12 +4,12 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.eagle.emulator.util.IniUtil;
+import java.nio.charset.StandardCharsets;
 
-import org.json.JSONObject;
-
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.setting.Setting;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -32,18 +32,18 @@ public class MoonlightHook {
                 String path = intent.getDataString();
                 if (StrUtil.isBlank(path)) return;
 
-                JSONObject info = IniUtil.parseIni(path);
+                Setting setting = new Setting(FileUtil.file(path), StandardCharsets.UTF_8, false);
 
-                String appId = info.getString("AppId");
+                String appId = setting.getStr("AppId");
                 if (StrUtil.isNotBlank(appId)) intent.putExtra("AppId", appId);
 
-                String uuid = info.getString("UUID");
+                String uuid = setting.getStr("UUID");
                 if (StrUtil.isNotBlank(uuid)) intent.putExtra("UUID", uuid);
 
-                String appName = info.getString("AppName");
+                String appName = setting.getStr("AppName");
                 if (StrUtil.isNotBlank(appName)) intent.putExtra("AppName", appName);
 
-                Boolean hdr = info.getBoolean("HDR");
+                Boolean hdr = setting.getBool("HDR");
                 if (ObjUtil.isNotEmpty(hdr)) intent.putExtra("HDR", hdr);
             }
         });

@@ -9,8 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.eagle.emulator"
-        minSdk 30
-        targetSdk 34
+        minSdk 26
         versionCode 1
         versionName "1.0"
 

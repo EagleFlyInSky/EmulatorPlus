@@ -2,7 +2,7 @@ package com.eagle.emulator.plus.overlay;
 
 import android.util.Log;
 
-import com.eagle.emulator.hook.HookParams;
+import com.eagle.emulator.HookParams;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -39,9 +39,20 @@ public class BaseOverlayConfig implements OverlayConfig {
     public static final String GROUP = "group";
     public static final String GAME = "game";
 
+    private boolean emptyNameForDefault = true;
+
+    public BaseOverlayConfig(String defaultPath, boolean emptyNameForDefault) {
+        this(defaultPath);
+        this.emptyNameForDefault = emptyNameForDefault;
+    }
+
     public BaseOverlayConfig(String configPath) {
 
         Log.i(HookParams.LOG_TAG, "configPath：" + configPath);
+
+        if (!FileUtil.exist(configPath)) {
+            FileUtil.mkdir(configPath);
+        }
 
         // 初始化默认图片
         String path = Paths.get(configPath, DEFAULT).toString();
@@ -66,6 +77,8 @@ public class BaseOverlayConfig implements OverlayConfig {
                     }
                 }
             }
+        } else {
+            FileUtil.mkdir(groupDir);
         }
 
         // 初始化游戏独立配置
@@ -80,6 +93,8 @@ public class BaseOverlayConfig implements OverlayConfig {
                     gameMapping.put(gameName, imagePath.getPath());
                 }
             }
+        } else {
+            FileUtil.mkdir(gameDir);
         }
 
         //logInfo();
@@ -97,18 +112,26 @@ public class BaseOverlayConfig implements OverlayConfig {
     public String getOverlayImage(GameInfo gameInfo) {
 
         String name = gameInfo.getName();
-        if (CollUtil.isNotEmpty(gameMapping)) {
-            String path = gameMapping.get(name);
-            if (StrUtil.isNotBlank(path)) {
-                return path;
+
+        if (StrUtil.isNotBlank(name)) {
+            if (CollUtil.isNotEmpty(gameMapping)) {
+                String path = gameMapping.get(name);
+                if (StrUtil.isNotBlank(path)) {
+                    return path;
+                }
+            }
+
+            if (CollUtil.isNotEmpty(groupMapping)) {
+                String path = groupMapping.get(name);
+                if (StrUtil.isNotBlank(path)) {
+                    return path;
+                }
             }
         }
 
-        if (CollUtil.isNotEmpty(groupMapping)) {
-            String path = groupMapping.get(name);
-            if (StrUtil.isNotBlank(path)) {
-                return path;
-            }
+        // 名称为空，并设置为false
+        if (StrUtil.isBlank(name) && !this.emptyNameForDefault) {
+            return null;
         }
 
         if (StrUtil.isNotBlank(defaultPath)) {

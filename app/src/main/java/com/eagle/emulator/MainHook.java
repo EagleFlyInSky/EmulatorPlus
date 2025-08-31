@@ -2,7 +2,6 @@ package com.eagle.emulator;
 
 import android.util.Log;
 
-import com.eagle.emulator.hook.HookParams;
 import com.eagle.emulator.hook.beacon.BeaconHook;
 import com.eagle.emulator.hook.es.EsDeHook;
 import com.eagle.emulator.hook.gal.TyranorHook;
@@ -11,6 +10,7 @@ import com.eagle.emulator.hook.rpg.AopAopHook;
 import com.eagle.emulator.hook.rpg.JoiPlayHook;
 import com.eagle.emulator.hook.rpg.JoiPlayPlugHook;
 import com.eagle.emulator.hook.rpg.MaldiVesHook;
+import com.eagle.emulator.hook.windows.EggGameHook;
 import com.eagle.emulator.hook.windows.ExgearHook;
 import com.eagle.emulator.hook.windows.MoonlightHook;
 import com.eagle.emulator.hook.windows.WinlatorHook;
@@ -21,7 +21,9 @@ import com.eagle.emulator.plus.overlay.exagear.ExagearOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.HtmlOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.RpgOverlayHook;
 import com.eagle.emulator.plus.overlay.joiplay.RuffleOverlayHook;
+import com.eagle.emulator.plus.overlay.m64.M64OverlayHook;
 import com.eagle.emulator.plus.overlay.netherSX2.NetherSX2OverlayHook;
+import com.eagle.emulator.plus.overlay.saturn.SaturnEmuOverlayHook;
 import com.eagle.emulator.plus.overlay.winlator.WinlatorOverlayHook;
 
 import cn.hutool.core.util.StrUtil;
@@ -49,12 +51,17 @@ public class MainHook implements IXposedHookLoadPackage {
         Log.d(HookParams.LOG_TAG, "启动 EmulatorPlus : " + packageName);
 
         switch (packageName) {
+            // 跳过系统项
+            case HookParams.WEB_VIEW:
+                break;
+            //前端
             case HookParams.ES_DE:
                 EsDeHook.hook(lpparam);
                 break;
             case HookParams.BEACON:
                 BeaconHook.hook(lpparam);
                 break;
+            //模拟器
             case HookParams.AZAHAR:
                 new AzaharOverlayHook(lpparam).hook();
                 break;
@@ -63,6 +70,12 @@ public class MainHook implements IXposedHookLoadPackage {
                 break;
             case HookParams.DOLPHIN:
                 new DolphinOverlayHook(lpparam).hook();
+                break;
+            case HookParams.M64:
+                new M64OverlayHook(lpparam).hook();
+                break;
+            case HookParams.SATURN_EMU:
+                new SaturnEmuOverlayHook(lpparam).hook();
                 break;
             case HookParams.AOPAOP:
                 AopAopHook.hook(lpparam);
@@ -75,8 +88,7 @@ public class MainHook implements IXposedHookLoadPackage {
                 JoiPlayHook.hook(lpparam);
                 new HtmlOverlayHook(lpparam).hook();
                 break;
-            case HookParams.WEB_VIEW:
-                break;
+
             case HookParams.JOIPLAY_RUFFLE:
                 JoiPlayPlugHook.hookGamePad(lpparam);
                 new RuffleOverlayHook(lpparam).hook();
@@ -103,6 +115,9 @@ public class MainHook implements IXposedHookLoadPackage {
                 WinlatorHook.hook(lpparam);
                 // 遮罩
                 new WinlatorOverlayHook(lpparam).hook();
+                break;
+            case HookParams.EGG_GAME:
+                EggGameHook.hook(lpparam);
                 break;
             default:
                 // winlator hook
