@@ -18,7 +18,7 @@
 
 将`desktop`文件移动到 ROMs/windows
 
-`es_systems.xml``
+`es_systems.xml`
 
 ```xml
 <system>
