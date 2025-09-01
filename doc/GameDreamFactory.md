@@ -6,6 +6,7 @@
 
 主程序选最新 目前为 GameDreamFactory.2025-02-07.apk
 数据包
+
 - GameDreamFactory.2023-10-28.Windows.Linux.MacOS.Android.zip
 - GameDreamFactory.2024-08-01.patch.zip
 - GameDreamFactory.IntentStart.zip
@@ -19,19 +20,60 @@
 
 ```properties
 [Games]
-/storage/emulated/0/ROMs/mugen/索尼克战斗.mugen
+/storage/emulated/0/ROMs/mugen/索尼克战斗
 ```
 
 ## 功能
 
 ### 前端启动
 
-提醒，未后续适配Beacon 可能会修改实现方案，望谅解
+前端配置请自行添加，或着去下载我的最新整合版 [前端配置](https://github.com/EagleFlyInSky/ES-DE-Custom)
+
+在游戏文件夹内添加 XXX.mugen 文件即可
+
+例如 `/storage/emulated/0/ROMs/mugen/索尼克战斗` 是配置的游戏目录，创建文件 `/storage/emulated/0/ROMs/mugen/索尼克战斗/索尼克战斗.mugen`
+
 
 #### ES-DE
 
 前端启动，将游戏整合文件夹改名 xxx.mugen 复制到 ROMs/mugen 文件夹下
 
+`es_systems.xml`
+
+```xml
+
+<system>
+    <name>mugen</name>
+    <fullname>M.U.G.E.N Game Engine</fullname>
+    <path>%ROMPATH%/mugen</path>
+    <extension>.mugen</extension>
+    <command label="GameDreamFactory (Standalone)">%EMULATOR_GAME-DREAM-FACTORY% %EXTRA_path%=%ROM%</command>
+    <platform>mugen</platform>
+    <theme>mugen</theme>
+</system>
+```
+
+`es_find_rules.xml`
+
+```xml
+
+<emulator name="GAME-DREAM-FACTORY">
+    <rule type="androidpackage">
+        <entry>com.GameDreamFactoryAndroid/com.GameDreamFactoryAndroid.activities.MainActivity
+        </entry>
+    </rule>
+</emulator>
+```
+
 #### Beacon
 
-目前Beacon不支持文件夹扫描，等待之后适配
+`players_stable.json`
+
+```json
+{
+  "name": "Mugen",
+  "shortname": "MUGEN",
+  "extensions": "mugen",
+  "launch": "am start -n com.GameDreamFactoryAndroid/com.GameDreamFactoryAndroid.activities.MainActivity -e path {dir_path}"
+}
+```

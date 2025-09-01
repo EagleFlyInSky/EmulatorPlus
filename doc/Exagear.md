@@ -14,11 +14,38 @@
 
 ### 前端启动
 
+启动程序并设置好快捷方式之后重启一次软件，模块会在 /storage/emulated/0/exagear/desktop/ 文件夹下生成启动快捷文件
+
 #### ES-DE
 
-启动程序并设置好快捷方式之后，模块会在 /storage/emulated/0/exagear/desktop/ 文件夹下生成启动快捷文件
-
 前端启动适配，将程序导出文件，修改合适的中文名后移动到 ROMs/windows
+
+
+`es_systems.xml``
+
+```xml
+<system>
+    <name>windows</name>
+    <fullname>Microsoft Windows</fullname>
+    <path>%ROMPATH%/windows</path>
+    <!-- 注意添加对应的后缀  -->
+    <extension>.desktop .shortcut .egg</extension>
+    <!-- Exagear 需要EmulatorPlus模块功能 -->
+    <command label="Exagear (Standalone)">%EMULATOR_EXAGEAR% %ACTION%=android.intent.action.MAIN %ACTIVITY_CLEAR_TASK% %ACTIVITY_CLEAR_TOP% %DATA%=%ROM%</command>
+    <!-- 省略其他模拟器配置 -->
+</system>
+```
+
+`es_find_rules.xml`
+
+```xml
+<!-- Exagear -->
+<emulator name="EXAGEAR">
+    <rule type="androidpackage">
+        <entry>com.ludashi.benchmara/com.ludashi.benchmara.activities.EDStartupActivity</entry>
+    </rule>
+</emulator>
+```
 
 ##### Exagear名称修改
 关于如何修改软件内的快捷方式名称
@@ -52,6 +79,16 @@ MT左侧便可以访问 Exagear的系统目录
 #### Beacon
 
 已适配，同上
+`players_stable.json`
+
+```json
+{
+  "name": "Windows",
+  "shortname": "WIN",
+  "extensions": "desktop",
+  "launch": "am start -n com.ludashi.benchmara/.activities.EDStartupActivity -d {file_path}"
+}
+```
 
 ### 支持遮罩功能
 
