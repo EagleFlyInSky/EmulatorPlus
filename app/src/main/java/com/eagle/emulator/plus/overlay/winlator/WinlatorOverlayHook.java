@@ -1,6 +1,5 @@
 package com.eagle.emulator.plus.overlay.winlator;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Environment;
 import android.view.View;
@@ -9,6 +8,7 @@ import android.view.ViewGroup;
 import com.eagle.emulator.HookParams;
 import com.eagle.emulator.hook.windows.WinlatorHook;
 import com.eagle.emulator.plus.overlay.OverlayHook;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.nio.file.Paths;
@@ -30,13 +30,16 @@ public class WinlatorOverlayHook extends OverlayHook {
         return Paths.get(absolutePath, "Android", "data", HookParams.WINLATOR, "files", "overlay").toString();
     }
 
+
     @Override
-    @SuppressLint("ResourceType")
-    public View getView(Activity activity) {
+    protected ViewInfo getViewInfo(Activity activity) {
         int resId = XposedUtil.getResourceId("FLXServerDisplay", lpparam, activity);
         ViewGroup viewGroup = activity.findViewById(resId);
-        return viewGroup.getChildAt(0);
+        View gameView = viewGroup.getChildAt(0);
+
+        return ViewInfo.builder().gameView(gameView).parentView(viewGroup).addImageView(true).imageViewIndex(1).build();
     }
+
 
     @Override
     public String getName(Activity activity) {

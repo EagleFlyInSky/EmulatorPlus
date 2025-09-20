@@ -6,14 +6,19 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eagle.emulator.HookParams;
+import com.eagle.emulator.hook.tools.ViewFind;
 import com.eagle.emulator.plus.overlay.OverlayHook;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 import com.eagle.emulator.util.HookUtil;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.util.URLUtil;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -43,32 +48,26 @@ public class DolphinOverlayHook extends OverlayHook {
     }
 
     @Override
-    public View getView(Activity activity) {
-
+    protected ViewInfo getViewInfo(Activity activity) {
         ViewGroup content = activity.findViewById(android.R.id.content);
-        if (content == null) {
+        ViewGroup viewGroup = ViewFind.findViewGroupByIndex(content, 0, 0, 0);
+        if (viewGroup == null) {
             return null;
         }
-        ViewGroup layout1 = (ViewGroup) content.getChildAt(0);
-        if (layout1 == null) {
-            return null;
-        }
-        ViewGroup layout2 = (ViewGroup) layout1.getChildAt(0);
-        if (layout2 == null) {
-            return null;
-        }
-        ViewGroup layout3 = (ViewGroup) layout2.getChildAt(0);
-        if (layout3 == null) {
-            return null;
-        }
-        return layout3.getChildAt(1);
+        View overlayView = viewGroup.getChildAt(1);
+        View gameView = viewGroup.getChildAt(0);
+
+        return ViewInfo.builder().overlayView(overlayView).gameView(gameView).build();
     }
+
 
     @Override
     public String getName(Activity activity) {
         String[] selectedGames = activity.getIntent().getStringArrayExtra("SelectedGames");
+        XposedBridge.log("SelectedGames" + Arrays.toString(selectedGames));
         if (selectedGames != null) {
-            return FileNameUtil.mainName(selectedGames[0]);
+            String selectedGame = selectedGames[0];
+            return FileNameUtil.mainName(URLUtil.decode(selectedGame));
         } else {
             return null;
         }

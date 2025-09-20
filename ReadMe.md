@@ -27,7 +27,7 @@
 
 所以使用一定注意Beacon是否为模块增强版
 
-[JoiPlay](doc/Beacon.md)
+[Beacon](doc/Beacon.md)
 
 ### 前端配置
 

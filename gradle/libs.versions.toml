@@ -1,12 +1,13 @@
 [versions]
 agp = "8.7.3"
-dexkit = "2.0.0"
-hutoolCore = "5.8.16"
+dexkit = "2.0.6"
+hutool = "5.8.16"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 kotlinStdlib = "2.1.20"
+lombok = "1.18.30"
 material = "1.12.0"
 yukihookapi = "1.2.1"
 apiVersion = "82"
@@ -14,13 +15,15 @@ fragment = "1.8.6"
 
 [libraries]
 dexkit = { module = "org.luckypray:dexkit", version.ref = "dexkit" }
-hutool-core = { module = "cn.hutool:hutool-core", version.ref = "hutoolCore" }
-hutool-setting = { module = "cn.hutool:hutool-setting", version.ref = "hutoolCore" }
+hutool-core = { module = "cn.hutool:hutool-core", version.ref = "hutool" }
+hutool-setting = { module = "cn.hutool:hutool-setting", version.ref = "hutool" }
+hutool-crypto = { module = "cn.hutool:hutool-crypto", version.ref = "hutool" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlinStdlib" }
+lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 yukihookapi = { module = "com.highcapable.yukihookapi:api", version.ref = "yukihookapi" }

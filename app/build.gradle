@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id 'io.freefair.lombok' version '8.14.2' apply false
 }
 
 android {
@@ -16,9 +17,29 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs{
+        release{
+            // 推荐：将敏感信息存储在环境变量或单独的文件中，而不是直接写在这里
+            storeFile file("../eagle.jks")
+            storePassword System.getenv("KEYSTORE_PASSWORD")
+            keyAlias "eagle"
+            keyPassword System.getenv("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
-        release {
+
+        debug {
+            // 启用代码混淆
             minifyEnabled false
+        }
+
+        release {
+            // 启用代码混淆
+            minifyEnabled true
+            // 启用资源压缩（通常与代码混淆一起使用）
+            shrinkResources true
+            // 指定混淆规则文件
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
 
@@ -40,14 +61,16 @@ android {
 }
 
 dependencies {
+
     implementation libs.androidx.fragment
-
-
-    //compileOnly fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly libs.xposed.api
     implementation libs.hutool.core
+    implementation libs.hutool.crypto
     implementation libs.hutool.setting
     implementation libs.dexkit
     implementation libs.kotlin.stdlib
+
+    compileOnly libs.xposed.api
+    compileOnly libs.lombok
+    annotationProcessor libs.lombok
 
 }

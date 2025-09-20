@@ -1,9 +1,9 @@
 package com.eagle.emulator.plus.overlay.azahar;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 
 import com.eagle.emulator.HookParams;
@@ -23,8 +23,10 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.setting.Setting;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -73,6 +75,16 @@ public class AzaharOverlayHook extends OverlayHook {
 
     @Override
     protected String getName(Activity activity) {
+
+        String dataString = activity.getIntent().getDataString();
+
+        if (StrUtil.isNotBlank(dataString)) {
+            String decode = URLUtil.decode(dataString);
+            String name = FileNameUtil.mainName(decode);
+            this.currentGame = name;
+            return name;
+        }
+
         Bundle extras = activity.getIntent().getExtras();
         if (extras != null) {
             Object game = extras.getParcelable("game");
@@ -87,7 +99,7 @@ public class AzaharOverlayHook extends OverlayHook {
     @Override
     protected GameInfo getGameInfo(Activity activity) {
         int code = getCode("SCREEN_LAYOUT");
-        Log.i(HookParams.LOG_TAG, "code : " + code);
+        XposedBridge.log("code : " + code);
         return new GameInfo(getName(activity), code);
     }
 
@@ -116,21 +128,26 @@ public class AzaharOverlayHook extends OverlayHook {
         hookGameStart();
     }
 
+    @Override
+    protected void setLayout(View view, String overlayImage) {
+
+    }
+
     private void hookChangeScreen() {
         Class<?> utilClass = XposedHelpers.findClass("org.citra.citra_emu.display.ScreenAdjustmentUtil", lpparam.classLoader);
         XposedHelpers.findAndHookMethod(utilClass, "changeScreenOrientation", int.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 int code = (int) param.args[0];
-                Log.i(HookParams.LOG_TAG, "code : " + code);
+                XposedBridge.log("code : " + code);
 
                 View view = getView(currentActivity);
                 String overlayImage = config.getOverlayImage(new GameInfo(currentGame, code));
 
-                Log.i(HookParams.LOG_TAG, currentGame + ":" + overlayImage);
+                XposedBridge.log(currentGame + ":" + overlayImage);
 
                 if (StrUtil.isNotBlank(overlayImage)) {
-                    setBackground(view, overlayImage);
+                    view.setBackground(Drawable.createFromPath(overlayImage));
                     Object util = param.thisObject;
                     Object settings = ReflectUtil.getFieldValue(util, "settings");
                     changeLayout(overlayImage, settings);
@@ -160,12 +177,15 @@ public class AzaharOverlayHook extends OverlayHook {
     }
 
     private void changeLayout(String overlayImage, Object settings) {
+        if (StrUtil.isBlank(overlayImage)) {
+            return;
+        }
         String settingPath = overlayImage.replace("png", "ini");
-        Log.i(HookParams.LOG_TAG, "配置路径 ：" + settingPath);
+        XposedBridge.log("配置路径 ：" + settingPath);
 
         if (FileUtil.exist(settingPath)) {
             Setting setting = new Setting(FileUtil.file(settingPath), StandardCharsets.UTF_8, false);
-            Log.i(HookParams.LOG_TAG, "读取配置 ：" + setting);
+            XposedBridge.log("读取配置 ：" + setting);
             List<String> keys = Arrays.asList("LANDSCAPE_TOP_X", "LANDSCAPE_TOP_Y", "LANDSCAPE_TOP_WIDTH", "LANDSCAPE_TOP_HEIGHT", "LANDSCAPE_BOTTOM_X", "LANDSCAPE_BOTTOM_Y", "LANDSCAPE_BOTTOM_WIDTH", "LANDSCAPE_BOTTOM_HEIGHT");
 
             for (String key : keys) {

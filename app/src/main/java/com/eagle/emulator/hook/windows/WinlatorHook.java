@@ -4,9 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.eagle.emulator.HookParams;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -19,6 +16,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -33,7 +31,7 @@ public class WinlatorHook {
 
     public static boolean hasClass(XC_LoadPackage.LoadPackageParam lpparam) {
         Class<?> clazz = XposedHelpers.findClass(HOOK_CLASS_NAME, lpparam.classLoader);
-        Log.i(HookParams.LOG_TAG, "class：" + clazz.getName());
+        XposedBridge.log("class：" + clazz.getName());
         return clazz != null;
     }
 
@@ -96,7 +94,7 @@ public class WinlatorHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
-                Log.i(HookParams.LOG_TAG, "Hook开始");
+                XposedBridge.log("Hook开始");
                 hook(param);
             }
 
@@ -108,7 +106,7 @@ public class WinlatorHook {
                     return;
                 }
                 String shortcutName = FileUtil.mainName(shortcut_path);
-                Log.i(HookParams.LOG_TAG, "shortcutName:" + shortcutName);
+                XposedBridge.log("shortcutName:" + shortcutName);
                 if (StrUtil.isBlank(shortcutName)) {
                     return;
                 }
@@ -124,7 +122,7 @@ public class WinlatorHook {
                 Object file = XposedHelpers.getObjectField(shortcut, "file");
                 String path = (String) XposedHelpers.callMethod(file, "getPath");
 
-                Log.i(HookParams.LOG_TAG, "id:" + id + " path:" + path);
+                XposedBridge.log("id:" + id + " path:" + path);
 
                 Intent intent = new Intent();
                 // 将解析得到的值设置到Intent中

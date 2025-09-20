@@ -5,8 +5,6 @@
 
         <!-- ES-DE -->
         <item>org.es_de.frontend</item>
-        <!-- Beacon -->
-        <item>com.radikal.gamelauncher</item>
         <!-- RPG -->
         <item>com.aopaop.app</item>
         <item>net.miririt.maldivesplayer</item>
@@ -35,6 +33,13 @@
         <item>com.explusalpha.SaturnEmu</item>
         <!-- 盖世 -->
         <item>com.xiaoji.egggame</item>
+
+        <item>org.ppsspp.ppsspp</item>
+
+        <item>org.citron.citron_emu</item>
+        <item>dev.eden.eden_emulator</item>
+        <item>info.cemu.cemu</item>
+        <item>org.citra.emu</item>
 
     </string-array>
 </resources>

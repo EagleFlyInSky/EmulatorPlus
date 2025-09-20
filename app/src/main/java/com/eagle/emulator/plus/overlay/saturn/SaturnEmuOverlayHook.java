@@ -2,27 +2,30 @@ package com.eagle.emulator.plus.overlay.saturn;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
 import com.eagle.emulator.HookParams;
+import com.eagle.emulator.hook.tools.ViewFind;
 import com.eagle.emulator.plus.overlay.BaseOverlayConfig;
 import com.eagle.emulator.plus.overlay.OverlayHook;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
+/**
+ * 目前无效
+ */
 public class SaturnEmuOverlayHook extends OverlayHook {
 
     public static final String HOOK_CLASS_NAME = "com.imagine.BaseActivity";
@@ -46,25 +49,23 @@ public class SaturnEmuOverlayHook extends OverlayHook {
         return Paths.get(absolutePath, "Android", "data", HookParams.SATURN_EMU, "files", "overlay").toString();
     }
 
-
     @Override
-    protected void setBackground(View view, String overlayImage) {
-        if (view instanceof ViewGroup) {
-            View overlay = new View(currentActivity);
-            overlay.setBackground(Drawable.createFromPath(overlayImage));
-            Log.i(HookParams.LOG_TAG, "设置背景");
-            ((ViewGroup) view).addView(overlay, 1);
-        }
+    public void hookMethod(Consumer<XC_MethodHook.MethodHookParam> consumer) {
+        XposedHelpers.findAndHookMethod(hookClassName, lpparam.classLoader, "onResume", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                consumer.accept(param);
+            }
+        });
     }
 
+
     @Override
-    protected View getView(Activity activity) {
-        this.currentActivity = activity;
-        ViewGroup viewGroup = activity.findViewById(android.R.id.content);
-        ImageView overlayView = new ImageView(activity);
-        overlayView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        viewGroup.addView(overlayView);
-        return overlayView;
+    protected ViewInfo getViewInfo(Activity activity) {
+        View decorView = activity.getWindow().getDecorView();
+        ViewFind.log(decorView);
+        ViewGroup content = activity.findViewById(android.R.id.content);
+        return ViewInfo.builder().parentView(content).addImageView(true).build();
     }
 
     @Override
@@ -79,7 +80,7 @@ public class SaturnEmuOverlayHook extends OverlayHook {
         XposedHelpers.findAndHookMethod(HOOK_CLASS_NAME, lpparam.classLoader, "onActivityResult", int.class, int.class, Intent.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
-                Log.i(HookParams.LOG_TAG, "onActivityResult");
+                XposedBridge.log("onActivityResult");
             }
         });
     }

@@ -2,8 +2,12 @@ package com.eagle.emulator.plus.overlay.joiplay;
 
 import android.app.Activity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
-import cn.hutool.core.util.ReflectUtil;
+import com.eagle.emulator.hook.tools.ViewFind;
+import com.eagle.emulator.plus.overlay.ViewInfo;
+
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class RuffleOverlayHook extends JoiPlayOverlayHook {
@@ -15,7 +19,12 @@ public class RuffleOverlayHook extends JoiPlayOverlayHook {
     }
 
     @Override
-    public View getView(Activity activity) {
-        return (View) ReflectUtil.getFieldValue(activity, "mSurfaceView");
+    protected ViewInfo getViewInfo(Activity activity) {
+        FrameLayout content = activity.findViewById(android.R.id.content);
+        ViewGroup viewGroup = ViewFind.findViewGroupByIndex(content, 0);
+        View overlayView = ViewFind.findViewByIndex(viewGroup, 1);
+        View gameView = ViewFind.findViewByIndex(viewGroup, 0);
+        return ViewInfo.builder().overlayView(overlayView).gameView(gameView).build();
     }
+
 }

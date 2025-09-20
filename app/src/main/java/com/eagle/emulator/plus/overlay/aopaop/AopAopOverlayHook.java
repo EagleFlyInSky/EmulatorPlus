@@ -6,10 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.eagle.emulator.HookParams;
+import com.eagle.emulator.dex.AopAopDex;
+import com.eagle.emulator.hook.tools.ViewFind;
 import com.eagle.emulator.plus.overlay.OverlayHook;
-
-import org.luckypray.dexkit.DexKitBridge;
-import org.luckypray.dexkit.result.FieldData;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 
 import java.nio.file.Paths;
 
@@ -20,10 +20,8 @@ public class AopAopOverlayHook extends OverlayHook {
 
     public static final String HOOK_CLASS_NAME = "com.aopaop.app.module.game.local.GamePlayerWebViewActivity";
 
-    public FieldData gameField;
-
     public AopAopOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam, HOOK_CLASS_NAME, true);
+        super(lpparam, HOOK_CLASS_NAME);
     }
 
     @Override
@@ -33,30 +31,21 @@ public class AopAopOverlayHook extends OverlayHook {
     }
 
     @Override
-    protected void initField(DexKitBridge bridge) {
-        gameField = findFieldFirst(hookClass, "com.aopaop.app.entity.game.LocalGameEntity", bridge);
-    }
-
-    @Override
-    public View getView(Activity activity) {
+    protected ViewInfo getViewInfo(Activity activity) {
         ViewGroup content = activity.findViewById(android.R.id.content);
-        if (content == null) {
+        ViewGroup viewGroup = ViewFind.findViewGroupByIndex(content, 0, 0);
+        if (viewGroup == null) {
             return null;
         }
-        ViewGroup layout1 = (ViewGroup) content.getChildAt(0);
-        if (layout1 == null) {
-            return null;
-        }
-        ViewGroup layout2 = (ViewGroup) layout1.getChildAt(0);
-        if (layout2 == null) {
-            return null;
-        }
-        return layout2.getChildAt(6);
+        View overlayView = viewGroup.getChildAt(6);
+        View gameView = viewGroup.getChildAt(0);
+
+        return ViewInfo.builder().overlayView(overlayView).gameView(gameView).build();
     }
 
     @Override
     public String getName(Activity activity) {
-        Object game = getField(activity, gameField);
+        Object game = getField(activity, AopAopDex.gameFieldData);
         return (String) ReflectUtil.getFieldValue(game, "gameName");
     }
 }

@@ -1,10 +1,15 @@
 package com.eagle.emulator.hook.tools;
 
-import android.util.Log;
+import android.content.res.Resources;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.eagle.emulator.HookParams;
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.util.StrUtil;
+import de.robv.android.xposed.XposedBridge;
 
 public class ViewFind {
 
@@ -18,6 +23,54 @@ public class ViewFind {
                 findView(child, processor);
             }
         }
+    }
+
+
+    public static ViewGroup findViewGroupByIndex(View view, Integer... indexes) {
+        View getView = findViewByIndex(view, indexes);
+        if (getView instanceof ViewGroup) {
+            return (ViewGroup) getView;
+        } else {
+            return null;
+        }
+    }
+
+
+    public static View findViewByIndex(View view, Integer... indexes) {
+        Queue<Integer> queue = new ArrayDeque<>();
+
+        // 入队 (添加元素到队尾)
+        for (Integer index : indexes) {
+            queue.offer(index);
+        }
+
+        return findViewByIndex(view, queue);
+
+    }
+
+
+    private static View findViewByIndex(View view, Queue<Integer> indexQueue) {
+
+        if (view == null) {
+            return null;
+        }
+
+        Integer index = indexQueue.poll();
+        if (index == null) {
+            return view;
+        }
+
+
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            View child = viewGroup.getChildAt(index);
+            if (child == null) {
+                return null;
+            }
+            return findViewByIndex(child, indexQueue);
+        }
+
+        return null;
     }
 
 
@@ -35,9 +88,30 @@ public class ViewFind {
 
     public static void log(View rootView) {
         ViewFind.logView(rootView, "", (view, parent) -> {
-            String msg = parent + ":" + view.getClass().getSimpleName() + view.getId();
+            long length = parent.length();
+            StringBuilder buffer = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                buffer.append(" ");
+            }
+            String prefix = buffer.toString();
+            String viewInfo = view.getClass().getSimpleName();
+            int id = view.getId();
+            if (id != -1) {
+                String resourceName = null;
+                try {
+                    resourceName = view.getContext().getResources().getResourceName(id);
+                } catch (Resources.NotFoundException ignored) {
+
+                }
+                if (StrUtil.isNotBlank(resourceName)) {
+                    viewInfo += (":" + FileNameUtil.mainName(resourceName));
+                } else {
+                    viewInfo += (":" + id);
+                }
+            }
+            String msg = StrUtil.format("{}=>{}", prefix, viewInfo);
+            XposedBridge.log(msg);
 //            view.setBackground(Drawable.createFromPath("/storage/emulated/0/Android/data/com.explusalpha.SaturnEmu/files/overlay/default.png"));
-            Log.i(HookParams.LOG_TAG, msg);
             return msg;
         });
     }

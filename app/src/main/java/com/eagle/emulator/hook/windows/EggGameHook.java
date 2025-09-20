@@ -7,11 +7,9 @@ import android.content.IntentSender;
 import android.content.pm.ShortcutInfo;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 
-import com.eagle.emulator.HookParams;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -22,6 +20,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -42,17 +41,17 @@ public class EggGameHook {
     }
 
     private static void hookCreateShortcut(XC_LoadPackage.LoadPackageParam lpparam) {
-        Log.i(HookParams.LOG_TAG, "Hook快捷方式创建开始");
+        XposedBridge.log("Hook快捷方式创建开始");
         XposedHelpers.findAndHookMethod("android.content.pm.ShortcutManager", lpparam.classLoader, "requestPinShortcut", ShortcutInfo.class, IntentSender.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Log.i(HookParams.LOG_TAG, "Hook快捷方式创建运行");
+                XposedBridge.log("Hook快捷方式创建运行");
                 super.beforeHookedMethod(param);
                 ShortcutInfo shortcutInfo = (ShortcutInfo) param.args[0];
                 Intent intent = shortcutInfo.getIntent();
                 if (intent != null) {
                     Bundle extras = intent.getExtras();
-                    Log.i(HookParams.LOG_TAG, "extras:" + extras);
+                    XposedBridge.log("extras:" + extras);
 
                     String localAppName = intent.getStringExtra("localAppName");
                     String absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -84,11 +83,11 @@ public class EggGameHook {
     public static void hookActivity(XC_LoadPackage.LoadPackageParam lpparam) {
 
 
-        Log.i(HookParams.LOG_TAG, "Hook前端启动开始");
+        XposedBridge.log("Hook前端启动开始");
         XposedHelpers.findAndHookMethod(SPLASH_CLASS, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Log.i(HookParams.LOG_TAG, "Hook前端启动运行");
+                XposedBridge.log("Hook前端启动运行");
                 super.beforeHookedMethod(param);
 
                 Activity activity = (Activity) param.thisObject;
@@ -123,6 +122,7 @@ public class EggGameHook {
                 // 清除调用状态
                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 newIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                newIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                 activity.startActivity(newIntent);
 
@@ -133,7 +133,7 @@ public class EggGameHook {
 
     public static void hookGameDetail(XC_LoadPackage.LoadPackageParam lpparam) {
 
-        Log.i(HookParams.LOG_TAG, "Hook Detail 开始");
+        XposedBridge.log("Hook Detail 开始");
 
 
         XposedHelpers.findAndHookMethod(Activity.class, "onWindowFocusChanged", boolean.class, new XC_MethodHook() {
@@ -161,7 +161,7 @@ public class EggGameHook {
                     public void onGlobalLayout() {
                         // 布局完成时调用
                         decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        Log.i(HookParams.LOG_TAG, "=======布局回调");
+                        XposedBridge.log("=======布局回调");
                     }
                 });
 
@@ -170,14 +170,14 @@ public class EggGameHook {
 
             private void viewClick(Activity activity) {
                 int resourceId = XposedUtil.getResourceId("download_cl", lpparam, activity);
-                Log.i(HookParams.LOG_TAG, "resourceId:" + resourceId);
+                XposedBridge.log("resourceId:" + resourceId);
                 View view = activity.findViewById(resourceId);
 
-                Log.i(HookParams.LOG_TAG, "view:" + view);
-                Log.i(HookParams.LOG_TAG, "view:" + view.getId());
+                XposedBridge.log("view:" + view);
+                XposedBridge.log("view:" + view.getId());
 
                 boolean b = view.hasOnClickListeners();
-                Log.i(HookParams.LOG_TAG, "view click listener " + b);
+                XposedBridge.log("view click listener " + b);
 
             }
         });
@@ -198,7 +198,7 @@ public class EggGameHook {
                 if (!hasFocus) {
                     return;
                 }
-                Log.i(HookParams.LOG_TAG, "=======view focus");
+                XposedBridge.log("=======view focus");
 
 
             }
@@ -207,15 +207,15 @@ public class EggGameHook {
 //        XposedHelpers.findAndHookMethod("com.xj.landscape.launcher.adapter.GameDetailAdapter", lpparam.classLoader, "onBindViewHolder", holderClass, int.class, List.class, new XC_MethodHook() {
 //            @Override
 //            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                Log.i(HookParams.LOG_TAG, "hook bind");
+//                XposedBridge.log( "hook bind");
 //                super.afterHookedMethod(param);
 //                Object adapter = param.thisObject;
 //                Activity activity = (Activity) ReflectUtil.getFieldValue(adapter, "a");
 //                int resourceId = XposedUtil.getResourceId("download_cl", lpparam, activity);
-//                Log.i(HookParams.LOG_TAG, "resourceId:" + resourceId);
+//                XposedBridge.log( "resourceId:" + resourceId);
 //                View view = activity.findViewById(resourceId);
-//                Log.i(HookParams.LOG_TAG, "view:" + view);
-//                Log.i(HookParams.LOG_TAG, "view:" + view.getId());
+//                XposedBridge.log( "view:" + view);
+//                XposedBridge.log( "view:" + view.getId());
 //                view.performClick();
 //            }
 //        });
@@ -232,9 +232,9 @@ public class EggGameHook {
                 if (view.getId() != resourceId) {
                     return;
                 }
-                Log.i(HookParams.LOG_TAG, "=======设置点击事件" + originalListener);
+                XposedBridge.log("=======设置点击事件" + originalListener);
 //                XposedUtil.logStackTrace();
-//                Log.i(HookParams.LOG_TAG, "Hook view" + view.getId());
+//                XposedBridge.log( "Hook view" + view.getId());
             }
         });
 
@@ -244,11 +244,11 @@ public class EggGameHook {
 
         String wineClass = "com.xj.winemu.WineActivity";
 
-        Log.i(HookParams.LOG_TAG, "Hook Wine 开始");
+        XposedBridge.log("Hook Wine 开始");
         XposedHelpers.findAndHookMethod(wineClass, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                Log.i(HookParams.LOG_TAG, "Hook Wine 运行");
+                XposedBridge.log("Hook Wine 运行");
                 super.beforeHookedMethod(param);
 
                 Activity activity = (Activity) param.thisObject;
@@ -260,12 +260,12 @@ public class EggGameHook {
                 Intent intent = activity.getIntent();
 
                 Bundle extras = intent.getExtras();
-                Log.i(HookParams.LOG_TAG, "extras：" + extras);
+                XposedBridge.log("extras：" + extras);
 
                 Set<String> keySet = extras.keySet();
                 for (String key : keySet) {
                     String value = intent.getStringExtra(key);
-                    Log.i(HookParams.LOG_TAG, key + " ：" + value);
+                    XposedBridge.log(key + " ：" + value);
                 }
 
 
@@ -278,7 +278,7 @@ public class EggGameHook {
 
         String setupClass = "com.xj.winemu.PcEmuSetupDialog";
 
-        Log.i(HookParams.LOG_TAG, "Hook Setup 开始");
+        XposedBridge.log("Hook Setup 开始");
         XposedHelpers.findAndHookMethod(setupClass, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -290,7 +290,7 @@ public class EggGameHook {
                 if (!dialog.getClass().getName().equals(setupClass)) {
                     return;
                 }
-                Log.i(HookParams.LOG_TAG, "Hook Setup 运行");
+                XposedBridge.log("Hook Setup 运行");
 
 
             }

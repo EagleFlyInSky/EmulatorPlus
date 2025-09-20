@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import org.luckypray.dexkit.DexKitBridge;
+import com.eagle.emulator.dex.JoiPlayDex;
+import com.eagle.emulator.hook.tools.ViewFind;
+import com.eagle.emulator.plus.overlay.ViewInfo;
+
 import org.luckypray.dexkit.result.FieldData;
 
 import cn.hutool.core.util.ReflectUtil;
@@ -21,24 +24,20 @@ public class HtmlOverlayHook extends JoiPlayOverlayHook {
 
 
     public HtmlOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam, HOOK_CLASS_NAME, true);
+        super(lpparam, HOOK_CLASS_NAME);
     }
 
     @Override
-    protected void initField(DexKitBridge bridge) {
-        gameField = findField(hookClass, "cyou.joiplay.commons.models.Game", bridge);
-        layoutField = findField(hookClass, "android.widget.FrameLayout", bridge);
-    }
-
-    @Override
-    public View getView(Activity activity) {
-        FrameLayout frameLayout = getField(activity, layoutField);
-        return frameLayout != null ? frameLayout.getChildAt(1) : null;
+    protected ViewInfo getViewInfo(Activity activity) {
+        FrameLayout frameLayout = getField(activity, JoiPlayDex.layoutField);
+        View overlayView = ViewFind.findViewByIndex(frameLayout, 1);
+        View gameView = ViewFind.findViewByIndex(frameLayout, 0);
+        return ViewInfo.builder().overlayView(overlayView).gameView(gameView).build();
     }
 
     @Override
     public String getName(Activity activity) {
-        Object game = getField(activity, gameField);
+        Object game = getField(activity, JoiPlayDex.gameField);
         if (game != null) {
             return (String) ReflectUtil.getFieldValue(game, "title");
         } else {

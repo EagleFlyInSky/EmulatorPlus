@@ -6,10 +6,9 @@ import android.os.Environment;
 import android.view.View;
 
 import com.eagle.emulator.HookParams;
+import com.eagle.emulator.dex.NetherSX2Dex;
 import com.eagle.emulator.plus.overlay.OverlayHook;
-
-import org.luckypray.dexkit.DexKitBridge;
-import org.luckypray.dexkit.result.FieldData;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 
 import java.nio.file.Paths;
 
@@ -20,10 +19,8 @@ public class NetherSX2OverlayHook extends OverlayHook {
 
     public static final String HOOK_CLASS_NAME = "xyz.aethersx2.android.EmulationActivity";
 
-    private FieldData viewField;
-
     public NetherSX2OverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
-        super(lpparam, HOOK_CLASS_NAME, true);
+        super(lpparam, HOOK_CLASS_NAME);
     }
 
     @Override
@@ -33,13 +30,12 @@ public class NetherSX2OverlayHook extends OverlayHook {
     }
 
     @Override
-    protected void initField(DexKitBridge bridge) {
-        viewField = findField(hookClass, "xyz.aethersx2.android.EmulationSurfaceView", bridge);
-    }
-
-    @Override
-    public View getView(Activity activity) {
-        return getField(activity, viewField);
+    protected ViewInfo getViewInfo(Activity activity) {
+        ViewInfo viewInfo = new ViewInfo();
+        View view = getField(activity, NetherSX2Dex.viewField);
+        viewInfo.setGameView(view);
+        viewInfo.setAddImageView(true);
+        return viewInfo;
     }
 
     @Override

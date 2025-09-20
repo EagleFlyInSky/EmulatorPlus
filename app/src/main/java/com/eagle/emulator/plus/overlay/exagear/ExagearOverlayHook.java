@@ -4,11 +4,11 @@ import android.app.Activity;
 import android.os.Environment;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
+import com.eagle.emulator.hook.tools.ViewFind;
 import com.eagle.emulator.hook.windows.ExgearHook;
 import com.eagle.emulator.plus.overlay.OverlayHook;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.nio.file.Paths;
@@ -33,14 +33,13 @@ public class ExagearOverlayHook extends OverlayHook {
         return Paths.get(absolutePath, "Android", "data", "com.ludashi.benchmara", "files", "overlay").toString();
     }
 
+
     @Override
-    protected View getView(Activity activity) {
+    protected ViewInfo getViewInfo(Activity activity) {
         int resourceId = XposedUtil.getResourceId("mainView", lpparam, activity);
         ViewGroup viewGroup = activity.findViewById(resourceId);
-        ImageView overlayView = new ImageView(activity);
-        overlayView.setLayoutParams(new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        viewGroup.addView(overlayView);
-        return overlayView;
+        View gameView = ViewFind.findViewByIndex(viewGroup, 0, 0);
+        return ViewInfo.builder().gameView(gameView).parentView(viewGroup).addImageView(true).build();
     }
 
     @Override

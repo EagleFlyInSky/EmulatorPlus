@@ -23,10 +23,10 @@ public class JoiPlayPlugHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
                 super.beforeHookedMethod(param);
-                //Log.i(HookParams.LOG_TAG, "Hook按键配置");
+                //XposedBridge.log( "Hook按键配置");
                 String prefix = (String) param.args[0];
                 if (absolutePath.equals(prefix)) {
-                    //Log.i(HookParams.LOG_TAG, "配置文件:" + thisObject);
+                    //XposedBridge.log( "配置文件:" + thisObject);
                     param.setResult(true);
                 }
             }

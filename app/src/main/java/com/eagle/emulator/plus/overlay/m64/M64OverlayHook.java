@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.eagle.emulator.HookParams;
 import com.eagle.emulator.plus.overlay.OverlayHook;
+import com.eagle.emulator.plus.overlay.ViewInfo;
 import com.eagle.emulator.util.XposedUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -28,6 +29,13 @@ public class M64OverlayHook extends OverlayHook {
     protected String getConfigPath() {
         String absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath();
         return Paths.get(absolutePath, "Android", "data", HookParams.M64, "files", "overlay").toString();
+    }
+
+    @Override
+    protected ViewInfo getViewInfo(Activity activity) {
+        int resourceId = XposedUtil.getResourceId("gameOverlay", lpparam, activity);
+        View overlayView = activity.findViewById(resourceId);
+        return ViewInfo.builder().overlayView(overlayView).build();
     }
 
     @Override

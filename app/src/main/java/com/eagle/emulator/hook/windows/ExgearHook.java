@@ -2,9 +2,6 @@ package com.eagle.emulator.hook.windows;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.util.Log;
-
-import com.eagle.emulator.HookParams;
 
 import org.json.JSONObject;
 
@@ -19,6 +16,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.ReflectUtil;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -51,7 +49,7 @@ public class ExgearHook {
             @Override
             protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {
                 super.afterHookedMethod(param);
-                Log.i(HookParams.LOG_TAG, "Hook开始");
+                XposedBridge.log("Hook开始");
                 hook(param);
             }
 
@@ -88,7 +86,7 @@ public class ExgearHook {
                         String filePath = dirPath + name + ".desktop";
                         File file = FileUtil.newFile(filePath);
                         FileUtil.writeString(text, file, StandardCharsets.UTF_8);
-                        Log.i(HookParams.LOG_TAG, "写入快捷方式：" + filePath + "\n" + text);
+                        XposedBridge.log("写入快捷方式：" + filePath + "\n" + text);
                     }
                 }
             }
@@ -99,7 +97,7 @@ public class ExgearHook {
 
                 Object shortcut = null;
                 for (Object o : list) {
-                    Log.i(HookParams.LOG_TAG, o.toString());
+                    XposedBridge.log(o.toString());
                     Object link = XposedHelpers.getObjectField(o, "mLink");
                     String name = (String) XposedHelpers.getObjectField(link, "name");
 
@@ -171,7 +169,7 @@ public class ExgearHook {
                 super.beforeHookedMethod(param);
                 // 获取执行对象
                 Activity activity = (Activity) param.thisObject;
-                Log.i(HookParams.LOG_TAG, "onXDGLinkSelected :" + activity.getClass().getName());
+                XposedBridge.log("onXDGLinkSelected :" + activity.getClass().getName());
                 // 确认是对象类型
                 String name = activity.getClass().getName();
                 if (!name.equals(HOOK_CLASS_NAME)) {

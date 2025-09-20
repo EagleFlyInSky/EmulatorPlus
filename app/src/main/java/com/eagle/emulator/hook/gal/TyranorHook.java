@@ -3,10 +3,7 @@ package com.eagle.emulator.hook.gal;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
-
-import com.eagle.emulator.HookParams;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,6 +16,7 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
 import de.robv.android.xposed.XC_MethodHook;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
@@ -75,21 +73,21 @@ public class TyranorHook {
                 // 获取路径参数
                 String path = intent.getDataString();
                 if (StrUtil.isBlank(path)) return;
-                Log.i(HookParams.LOG_TAG, "path: " + path);
+                XposedBridge.log("path: " + path);
 
                 // 通过后缀判断游戏类型
                 String name = FileNameUtil.getName(path);
                 String suffix = FileNameUtil.getSuffix(name);
-                Log.i(HookParams.LOG_TAG, "suffix: " + suffix);
+                XposedBridge.log("suffix: " + suffix);
                 String type = getType(suffix);
-                Log.i(HookParams.LOG_TAG, "type: " + type);
+                XposedBridge.log("type: " + type);
                 if (StrUtil.isBlank(type)) {
                     Toast.makeText(activity, "文件后缀不是支持的游戏类型", Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 String game = getJsonObject(path, type).toString();
-                Log.i(HookParams.LOG_TAG, "game: " + game.replace("\\/", "/"));
+                XposedBridge.log("game: " + game.replace("\\/", "/"));
                 if (StrUtil.isNotBlank(game)) {
                     intent.putExtra("game", game);
                 }

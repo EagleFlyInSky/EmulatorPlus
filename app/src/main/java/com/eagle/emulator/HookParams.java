@@ -25,7 +25,6 @@ public class HookParams {
     public static final String EXAGEAR = "com.ludashi.benchmara";
 
     public static final String ES_DE = "org.es_de.frontend";
-    public static final String BEACON = "com.radikal.gamelauncher";
 
     public static final String NETHERSX2 = "xyz.aethersx2.android";
 
@@ -36,9 +35,16 @@ public class HookParams {
     public static final String WINLATOR = "com.winlator";
 
     public static final String M64 = "org.mupen64plusae.v3.fzurita.pro";
+
     public static final String SATURN_EMU = "com.explusalpha.SaturnEmu";
 
     public static final String EGG_GAME = "com.xiaoji.egggame";
+
+    public static final String PPSSPP = "org.ppsspp.ppsspp";
+    public static final String CITRON = "org.citron.citron_emu";
+    public static final String EDEN = "dev.eden.eden_emulator";
+    public static final String CEMU = "info.cemu.cemu";
+    public static final String CITRA_MMJ = "org.citra.emu";
 
 
 }

@@ -1,14 +1,15 @@
 package com.eagle.emulator.util;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
-
-import com.eagle.emulator.HookParams;
+import android.os.Bundle;
 
 import java.util.Arrays;
 
 import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
+import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class XposedUtil {
@@ -24,6 +25,15 @@ public class XposedUtil {
 
     public static void logStackTrace() {
         StackTraceElement[] stackTrace = ThreadUtil.getStackTrace();
-        Log.i(HookParams.LOG_TAG, "调用栈：" + Arrays.toString(stackTrace));
+        XposedBridge.log(StrUtil.format("调用栈：{}", Arrays.toString(stackTrace)));
+    }
+
+    public static void logExtras(Activity activity) {
+        Bundle extras = activity.getIntent().getExtras();
+        if (extras != null) {
+            for (String key : extras.keySet()) {
+                XposedBridge.log("extras: " + key + "--" + extras.get(key));
+            }
+        }
     }
 }

@@ -1,9 +1,5 @@
 package com.eagle.emulator.plus.overlay;
 
-import android.util.Log;
-
-import com.eagle.emulator.HookParams;
-
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -15,6 +11,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.StrUtil;
+import de.robv.android.xposed.XposedBridge;
 
 public class BaseOverlayConfig implements OverlayConfig {
 
@@ -47,8 +44,7 @@ public class BaseOverlayConfig implements OverlayConfig {
     }
 
     public BaseOverlayConfig(String configPath) {
-
-        Log.i(HookParams.LOG_TAG, "configPath：" + configPath);
+        XposedBridge.log(StrUtil.format("配置文件夹：{}", configPath));
 
         if (!FileUtil.exist(configPath)) {
             FileUtil.mkdir(configPath);
@@ -97,14 +93,14 @@ public class BaseOverlayConfig implements OverlayConfig {
             FileUtil.mkdir(gameDir);
         }
 
-        //logInfo();
+        logInfo();
 
     }
 
     public void logInfo() {
-        Log.i(HookParams.LOG_TAG, "defaultPath：" + defaultPath);
-        Log.i(HookParams.LOG_TAG, "groupMapping：" + groupMapping);
-        Log.i(HookParams.LOG_TAG, "gameMapping：" + gameMapping);
+        XposedBridge.log(StrUtil.format("默认配置：{}", defaultPath));
+        XposedBridge.log(StrUtil.format("分组配置：{}", groupMapping.toString()));
+        XposedBridge.log(StrUtil.format("独立配置：{}", gameMapping.toString()));
     }
 
 
