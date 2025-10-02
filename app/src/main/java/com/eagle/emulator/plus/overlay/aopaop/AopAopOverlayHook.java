@@ -10,6 +10,7 @@ import com.eagle.emulator.dex.AopAopDex;
 import com.eagle.emulator.hook.tools.ViewFind;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 import com.eagle.emulator.plus.overlay.ViewInfo;
+import com.eagle.emulator.util.DexKitUtil;
 
 import java.nio.file.Paths;
 
@@ -45,7 +46,7 @@ public class AopAopOverlayHook extends OverlayHook {
 
     @Override
     public String getName(Activity activity) {
-        Object game = getField(activity, AopAopDex.gameFieldData);
+        Object game = DexKitUtil.getField(activity, AopAopDex.gameFieldData);
         return (String) ReflectUtil.getFieldValue(game, "gameName");
     }
 }

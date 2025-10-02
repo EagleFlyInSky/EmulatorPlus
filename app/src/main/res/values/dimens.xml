@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="size_icon">30dp</dimen>
+    <!-- 可以添加更多尺寸 -->
+    <dimen name="size_small">8dp</dimen>
+    <dimen name="size_medium">16dp</dimen>
+    <dimen name="size_large">24dp</dimen>
+</resources>

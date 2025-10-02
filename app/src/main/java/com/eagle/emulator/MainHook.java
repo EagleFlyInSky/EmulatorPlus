@@ -1,5 +1,8 @@
 package com.eagle.emulator;
 
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+
 import com.eagle.emulator.dex.AopAopDex;
 import com.eagle.emulator.dex.JoiPlayDex;
 import com.eagle.emulator.dex.NetherSX2Dex;
@@ -32,10 +35,34 @@ import com.eagle.emulator.plus.overlay.winlator.WinlatorOverlayHook;
 
 import cn.hutool.core.util.StrUtil;
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XposedBridge;
+import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public class MainHook implements IXposedHookLoadPackage {
+public class MainHook implements IXposedHookZygoteInit, IXposedHookLoadPackage {
+
+    private static Resources MODULE_RESOURCES = null;
+
+    @Override
+    public void initZygote(IXposedHookZygoteInit.StartupParam startupParam) {
+
+        // 获取模块的Resources
+        try {
+            AssetManager assetManager = AssetManager.class.newInstance();
+            XposedHelpers.callMethod(assetManager, "addAssetPath", startupParam.modulePath);
+            Resources superRes = Resources.getSystem();
+            MODULE_RESOURCES = new Resources(assetManager, superRes.getDisplayMetrics(), superRes.getConfiguration());
+        } catch (Exception e) {
+            XposedBridge.log("无法获取模块资源");
+            XposedBridge.log(e);
+        }
+    }
+
+    public static Resources getModuleResources() {
+        return MODULE_RESOURCES;
+    }
+
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam lpparam) {
@@ -136,7 +163,11 @@ public class MainHook implements IXposedHookLoadPackage {
                 new EdenOverlayHook(lpparam).hook();
                 break;
             default:
+                if (CitraHook.hasClass(lpparam)) {
+                    CitraHook.hook(lpparam);
+                }
         }
     }
+
 
 }

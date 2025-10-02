@@ -15,6 +15,9 @@
 | [Azahar](Azahar.md)       | /storage/emulated/0/Android/data/io.github.lime3ds.android/files/overlay        |
 | [Exagear](Exagear.md)     | /storage/emulated/0/Android/data/com.ludashi.benchmara/files/overlay            |
 | [M64Plus FZ Pro](M64.md)  | /storage/emulated/0/Android/data/org.mupen64plusae.v3.fzurita.pro/files/overlay |
+| [Cemu](Cemu.md)           | /storage/emulated/0/Android/data/info.cemu.cemu/files/overlay                   |
+| [Citron](Citron.md)       | /storage/emulated/0/Android/data/org.citron.citron_emu/files/overlay            |
+| [Eden](Eden.md)           | /storage/emulated/0/Android/data/dev.eden.eden_emulator/files/overlay           |
 
 ## 配置名称
 
@@ -29,6 +32,9 @@
 | Dolphin        | rom文件名称（不含后缀）      |
 | Azahar         | rom文件名称（不含后缀）      |
 | M64Plus FZ Pro | rom文件名称（不含后缀）      |
+| Cemu           | rom文件名称（不含后缀）      |
+| Citron         | rom文件名称（不含后缀）      |
+| Eden           | rom文件名称（不含后缀）      |
 | Exagear        | 软件内快捷方式文件名称        |
 
 [Exagear名称修改](Exagear.md#exagear名称修改)
@@ -75,6 +81,9 @@ game文件夹下放置放置相同名称的一张png图片和txt文档，在txt�
 | NetherSX2      | 支持   |
 | Dolphin        | 支持   |
 | Azahar         | 支持   |
+| Cemu           | 支持   |
+| Citron         | 支持   |
+| Eden           | 支持   |
 | M64Plus FZ Pro | 不支持  |
 | Exagear        | 不支持  |
 

@@ -63,9 +63,13 @@ android {
 dependencies {
 
     implementation libs.androidx.fragment
+    implementation libs.androidx.recyclerview
+
     implementation libs.hutool.core
     implementation libs.hutool.crypto
     implementation libs.hutool.setting
+
+    implementation 'com.moandjiezana.toml:toml4j:0.7.2'
     implementation libs.dexkit
     implementation libs.kotlin.stdlib
 

@@ -9,6 +9,7 @@ import com.eagle.emulator.HookParams;
 import com.eagle.emulator.dex.NetherSX2Dex;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 import com.eagle.emulator.plus.overlay.ViewInfo;
+import com.eagle.emulator.util.DexKitUtil;
 
 import java.nio.file.Paths;
 
@@ -32,7 +33,7 @@ public class NetherSX2OverlayHook extends OverlayHook {
     @Override
     protected ViewInfo getViewInfo(Activity activity) {
         ViewInfo viewInfo = new ViewInfo();
-        View view = getField(activity, NetherSX2Dex.viewField);
+        View view = DexKitUtil.getField(activity, NetherSX2Dex.viewField);
         viewInfo.setGameView(view);
         viewInfo.setAddImageView(true);
         return viewInfo;

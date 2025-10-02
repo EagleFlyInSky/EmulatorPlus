@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.eagle.emulator.HookParams;
 import com.eagle.emulator.plus.overlay.GameInfo;
+import com.eagle.emulator.plus.overlay.OverlayConfigHook;
 import com.eagle.emulator.plus.overlay.OverlayHook;
 import com.eagle.emulator.util.HookUtil;
 import com.eagle.emulator.util.XposedUtil;
@@ -37,6 +40,7 @@ public class AzaharOverlayHook extends OverlayHook {
     private Activity currentActivity;
 
     private String currentGame;
+    private boolean isViewOpen = false;
 
     public AzaharOverlayHook(XC_LoadPackage.LoadPackageParam lpparam) {
         super(lpparam, HOOK_CLASS_NAME);
@@ -99,7 +103,6 @@ public class AzaharOverlayHook extends OverlayHook {
     @Override
     protected GameInfo getGameInfo(Activity activity) {
         int code = getCode("SCREEN_LAYOUT");
-        XposedBridge.log("code : " + code);
         return new GameInfo(getName(activity), code);
     }
 
@@ -122,15 +125,41 @@ public class AzaharOverlayHook extends OverlayHook {
     }
 
     @Override
+    protected void handlerPlus(XC_MethodHook.MethodHookParam param) {
+        this.configHook = new OverlayConfigHook(param, getName(currentActivity));
+    }
+
+    public void changeFont() {
+
+    }
+
+    @Override
     public void hookPlus() {
-        HookUtil.hookToastShowByResourceName("emulation_menu_help", lpparam);
-        hookChangeScreen();
         hookGameStart();
+        hookChangeScreen();
+        hookMenu();
+        HookUtil.hookToastShowByResourceName("emulation_menu_help", lpparam);
+    }
+
+    private void hookMenu() {
+        XposedHelpers.findAndHookMethod("com.google.android.material.navigation.NavigationView", lpparam.classLoader, "inflateMenu", int.class, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) {
+                View navigationView = (View) param.thisObject;
+                Menu menu = (Menu) XposedHelpers.callMethod(navigationView, "getMenu");
+                MenuItem menuItem = menu.add("遮罩&字体");
+                menuItem.setOnMenuItemClickListener(item -> {
+                    configHook.swipeUp();
+                    menu.close();
+                    return false;
+                });
+            }
+        });
     }
 
     @Override
     protected void setLayout(View view, String overlayImage) {
-
+        // 区别于其他模拟器，azahar有特殊的布局处理，这里空覆盖通用布局设置
     }
 
     private void hookChangeScreen() {
@@ -139,7 +168,6 @@ public class AzaharOverlayHook extends OverlayHook {
             @Override
             protected void beforeHookedMethod(MethodHookParam param) {
                 int code = (int) param.args[0];
-                XposedBridge.log("code : " + code);
 
                 View view = getView(currentActivity);
                 String overlayImage = config.getOverlayImage(new GameInfo(currentGame, code));

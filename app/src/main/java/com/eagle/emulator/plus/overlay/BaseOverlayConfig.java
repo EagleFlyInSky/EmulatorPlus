@@ -93,7 +93,7 @@ public class BaseOverlayConfig implements OverlayConfig {
             FileUtil.mkdir(gameDir);
         }
 
-        logInfo();
+        //logInfo();
 
     }
 

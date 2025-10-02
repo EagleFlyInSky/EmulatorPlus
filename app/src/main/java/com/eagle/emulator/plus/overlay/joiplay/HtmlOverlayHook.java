@@ -7,6 +7,7 @@ import android.widget.FrameLayout;
 import com.eagle.emulator.dex.JoiPlayDex;
 import com.eagle.emulator.hook.tools.ViewFind;
 import com.eagle.emulator.plus.overlay.ViewInfo;
+import com.eagle.emulator.util.DexKitUtil;
 
 import org.luckypray.dexkit.result.FieldData;
 
@@ -29,7 +30,7 @@ public class HtmlOverlayHook extends JoiPlayOverlayHook {
 
     @Override
     protected ViewInfo getViewInfo(Activity activity) {
-        FrameLayout frameLayout = getField(activity, JoiPlayDex.layoutField);
+        FrameLayout frameLayout = DexKitUtil.getField(activity, JoiPlayDex.layoutField);
         View overlayView = ViewFind.findViewByIndex(frameLayout, 1);
         View gameView = ViewFind.findViewByIndex(frameLayout, 0);
         return ViewInfo.builder().overlayView(overlayView).gameView(gameView).build();
@@ -37,7 +38,7 @@ public class HtmlOverlayHook extends JoiPlayOverlayHook {
 
     @Override
     public String getName(Activity activity) {
-        Object game = getField(activity, JoiPlayDex.gameField);
+        Object game = DexKitUtil.getField(activity, JoiPlayDex.gameField);
         if (game != null) {
             return (String) ReflectUtil.getFieldValue(game, "title");
         } else {

@@ -12,6 +12,7 @@ material = "1.12.0"
 yukihookapi = "1.2.1"
 apiVersion = "82"
 fragment = "1.8.6"
+recyclerview = "1.3.2"
 
 [libraries]
 dexkit = { module = "org.luckypray:dexkit", version.ref = "dexkit" }
@@ -27,10 +28,11 @@ lombok = { module = "org.projectlombok:lombok", version.ref = "lombok" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 yukihookapi = { module = "com.highcapable.yukihookapi:api", version.ref = "yukihookapi" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 yukihookapi-ksp = { module = "com.highcapable.yukihookapi:ksp-xposed", version.ref = "yukihookapi" }
 xposed-api = { module = "de.robv.android.xposed:api", version.ref = "apiVersion" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "fragment" }
+androidx-recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version.ref = "recyclerview" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -21,14 +21,6 @@
 
 ## 前端适配
 
-### 前端模块
-
-受限于Beacon的代码实现，有些指令Beacon不能支持，该模块扩展了Beacon功能
-
-所以使用一定注意Beacon是否为模块增强版
-
-[Beacon](doc/Beacon.md)
-
 ### 前端配置
 
 下面网址放置了最新的 ES-DE 和 Beacon 的前端启动适配配置
@@ -56,6 +48,14 @@
 [盖世游戏](doc/EggGame.md)
 
 [游戏梦工厂](doc/GameDreamFactory.md)
+
+[M64PlusFZ Pro](doc/M64.md)
+
+[Cemu](doc/Cemu.md)
+
+[Eden](doc/Eden.md)
+
+[Citron](doc/Citron.md)
 
 ## 适配中
 

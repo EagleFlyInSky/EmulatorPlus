@@ -9,14 +9,10 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
-import org.luckypray.dexkit.result.FieldData;
-
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.setting.Setting;
 import de.robv.android.xposed.XC_MethodHook;
@@ -31,11 +27,9 @@ public abstract class OverlayHook {
     protected Class<?> hookClass;
     protected OverlayConfig config;
 
-    public OverlayHook(XC_LoadPackage.LoadPackageParam lpparam, String hookClassName) {
-        this(lpparam, hookClassName, false);
-    }
+    protected OverlayConfigHook configHook;
 
-    public OverlayHook(XC_LoadPackage.LoadPackageParam lpparam, String hookClassName, boolean dexkit) {
+    public OverlayHook(XC_LoadPackage.LoadPackageParam lpparam, String hookClassName) {
         this.lpparam = lpparam;
         this.hookClassName = hookClassName;
         this.hookClass = XposedHelpers.findClass(hookClassName, lpparam.classLoader);
@@ -50,23 +44,14 @@ public abstract class OverlayHook {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    protected <T> T getField(Activity activity, FieldData fieldData) {
-        try {
-            Field fieldInstance = fieldData.getFieldInstance(lpparam.classLoader);
-            return (T) ReflectUtil.getFieldValue(activity, fieldInstance);
-        } catch (NoSuchFieldException e) {
-            XposedBridge.log(e);
-            return null;
-        }
-    }
-
     public final void hook() {
+
         if (config != null) {
             XposedBridge.log(StrUtil.format("Hook遮罩方法开始：{}", hookClassName));
             hookMethod(param -> {
                 XposedBridge.log(StrUtil.format("Hook遮罩方法运行"));
                 handler(param);
+                handlerPlus(param);
             });
             hookPlus();
         } else {
@@ -85,6 +70,11 @@ public abstract class OverlayHook {
                 consumer.accept(param);
             }
         });
+    }
+
+
+    protected void handlerPlus(XC_MethodHook.MethodHookParam param) {
+
     }
 
 

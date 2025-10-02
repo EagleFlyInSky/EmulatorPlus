@@ -17,7 +17,7 @@ public abstract class JoiPlayOverlayHook extends OverlayHook {
     }
 
     public JoiPlayOverlayHook(XC_LoadPackage.LoadPackageParam lpparam, String hookClassName, boolean dexkit) {
-        super(lpparam, hookClassName, dexkit);
+        super(lpparam, hookClassName);
     }
 
     @Override

@@ -1,15 +1,19 @@
 package com.eagle.emulator.util;
 
+import android.app.Activity;
+
 import org.luckypray.dexkit.DexKitBridge;
 import org.luckypray.dexkit.query.FindField;
 import org.luckypray.dexkit.query.matchers.FieldMatcher;
 import org.luckypray.dexkit.result.FieldData;
 import org.luckypray.dexkit.result.FieldDataList;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import cn.hutool.core.util.ReflectUtil;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
@@ -23,6 +27,8 @@ public class DexKitUtil {
 
     private static final List<Consumer<DexKitBridge>> consumers = new ArrayList<>();
 
+    private static XC_LoadPackage.LoadPackageParam lpparam;
+
 
     private static void initDexKit() {
 
@@ -35,12 +41,23 @@ public class DexKitUtil {
 
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> T getField(Activity activity, FieldData fieldData) {
+        try {
+            Field fieldInstance = fieldData.getFieldInstance(lpparam.classLoader);
+            return (T) ReflectUtil.getFieldValue(activity, fieldInstance);
+        } catch (NoSuchFieldException e) {
+            XposedBridge.log(e);
+            return null;
+        }
+    }
+
     public static void addFind(Consumer<DexKitBridge> consumer) {
         consumers.add(consumer);
     }
 
     public static void runFind(XC_LoadPackage.LoadPackageParam lpparam) {
-
+        DexKitUtil.lpparam = lpparam;
         String apkPath = lpparam.appInfo.sourceDir;
         try (DexKitBridge bridge = DexKitBridge.create(apkPath)) {
             for (Consumer<DexKitBridge> consumer : consumers) {

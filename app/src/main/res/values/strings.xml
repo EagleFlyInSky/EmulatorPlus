@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">EmulatorPlus</string>
+    <string name="image_add">添加</string>
+    <string name="image_back">返回</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
 </resources>

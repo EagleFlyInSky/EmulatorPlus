@@ -1,14 +1,13 @@
 package com.eagle.emulator.hook.windows;
 
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.ShortcutInfo;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.View;
-import android.view.ViewTreeObserver;
 
 import com.eagle.emulator.util.XposedUtil;
 
@@ -28,7 +27,6 @@ public class EggGameHook {
 
 
     private static final String GROUP = "Shortcut";
-
     private static final String SPLASH_CLASS = "com.xj.app.SplashActivity";
     private static final String DETAIL_CLASS = "com.xj.landscape.launcher.ui.gamedetail.GameDetailActivity";
 
@@ -37,6 +35,7 @@ public class EggGameHook {
 
         hookActivity(lpparam);
         hookCreateShortcut(lpparam);
+        hookGameDetail(lpparam);
 
     }
 
@@ -133,9 +132,7 @@ public class EggGameHook {
 
     public static void hookGameDetail(XC_LoadPackage.LoadPackageParam lpparam) {
 
-        XposedBridge.log("Hook Detail 开始");
-
-
+        XposedBridge.log("Hook自动启动开始");
         XposedHelpers.findAndHookMethod(Activity.class, "onWindowFocusChanged", boolean.class, new XC_MethodHook() {
 
             @Override
@@ -152,149 +149,16 @@ public class EggGameHook {
                     return;
                 }
 
-
-                viewClick(activity);
-
-                View decorView = activity.getWindow().getDecorView();
-                decorView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        // 布局完成时调用
-                        decorView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        XposedBridge.log("=======布局回调");
-                    }
-                });
-
-
-            }
-
-            private void viewClick(Activity activity) {
-                int resourceId = XposedUtil.getResourceId("download_cl", lpparam, activity);
-                XposedBridge.log("resourceId:" + resourceId);
-                View view = activity.findViewById(resourceId);
-
-                XposedBridge.log("view:" + view);
-                XposedBridge.log("view:" + view.getId());
-
-                boolean b = view.hasOnClickListeners();
-                XposedBridge.log("view click listener " + b);
-
-            }
-        });
-
-        XposedHelpers.findAndHookMethod(View.class, "onWindowFocusChanged", boolean.class, new XC_MethodHook() {
-
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-                super.afterHookedMethod(param);
-                View view = (View) param.thisObject;
-
-                int resourceId = XposedUtil.getResourceId("download_cl", lpparam, view.getContext());
-                if (view.getId() != resourceId) {
-                    return;
-                }
-
-                boolean hasFocus = (Boolean) param.args[0];
-                if (!hasFocus) {
-                    return;
-                }
-                XposedBridge.log("=======view focus");
+                new Handler().postDelayed(() -> {
+                    int resourceId = XposedUtil.getResourceId("download_cl", lpparam, activity);
+                    View view = activity.findViewById(resourceId);
+                    view.callOnClick();
+                }, 300);
 
 
             }
         });
 
-//        XposedHelpers.findAndHookMethod("com.xj.landscape.launcher.adapter.GameDetailAdapter", lpparam.classLoader, "onBindViewHolder", holderClass, int.class, List.class, new XC_MethodHook() {
-//            @Override
-//            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
-//                XposedBridge.log( "hook bind");
-//                super.afterHookedMethod(param);
-//                Object adapter = param.thisObject;
-//                Activity activity = (Activity) ReflectUtil.getFieldValue(adapter, "a");
-//                int resourceId = XposedUtil.getResourceId("download_cl", lpparam, activity);
-//                XposedBridge.log( "resourceId:" + resourceId);
-//                View view = activity.findViewById(resourceId);
-//                XposedBridge.log( "view:" + view);
-//                XposedBridge.log( "view:" + view.getId());
-//                view.performClick();
-//            }
-//        });
-
-
-        XposedHelpers.findAndHookMethod("android.view.View", lpparam.classLoader, "setOnClickListener", "android.view.View$OnClickListener", new XC_MethodHook() {
-            @Override
-            protected void afterHookedMethod(MethodHookParam param) {
-
-                View view = (View) param.thisObject;
-                View.OnClickListener originalListener = (View.OnClickListener) param.args[0];
-
-                int resourceId = XposedUtil.getResourceId("download_cl", lpparam, view.getContext());
-                if (view.getId() != resourceId) {
-                    return;
-                }
-                XposedBridge.log("=======设置点击事件" + originalListener);
-//                XposedUtil.logStackTrace();
-//                XposedBridge.log( "Hook view" + view.getId());
-            }
-        });
-
-    }
-
-    public static void hookWine(XC_LoadPackage.LoadPackageParam lpparam) {
-
-        String wineClass = "com.xj.winemu.WineActivity";
-
-        XposedBridge.log("Hook Wine 开始");
-        XposedHelpers.findAndHookMethod(wineClass, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedBridge.log("Hook Wine 运行");
-                super.beforeHookedMethod(param);
-
-                Activity activity = (Activity) param.thisObject;
-
-                if (!activity.getClass().getName().equals(wineClass)) {
-                    return;
-                }
-
-                Intent intent = activity.getIntent();
-
-                Bundle extras = intent.getExtras();
-                XposedBridge.log("extras：" + extras);
-
-                Set<String> keySet = extras.keySet();
-                for (String key : keySet) {
-                    String value = intent.getStringExtra(key);
-                    XposedBridge.log(key + " ：" + value);
-                }
-
-
-            }
-        });
-
-    }
-
-    public static void hookSetup(XC_LoadPackage.LoadPackageParam lpparam) {
-
-        String setupClass = "com.xj.winemu.PcEmuSetupDialog";
-
-        XposedBridge.log("Hook Setup 开始");
-        XposedHelpers.findAndHookMethod(setupClass, lpparam.classLoader, "onCreate", Bundle.class, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                XposedUtil.logStackTrace();
-                super.beforeHookedMethod(param);
-
-                Dialog dialog = (Dialog) param.thisObject;
-
-                if (!dialog.getClass().getName().equals(setupClass)) {
-                    return;
-                }
-                XposedBridge.log("Hook Setup 运行");
-
-
-            }
-        });
 
     }
 
